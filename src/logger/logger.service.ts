@@ -1,5 +1,5 @@
 import { Injectable, LoggerService } from '@nestjs/common';
-import { getWinstonFormat } from 'src/utils/logger/logger.format';
+import { getWinstonFormat } from '../utils/logger/logger.format';
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
 
@@ -33,23 +33,23 @@ export class WinstonLogger implements LoggerService {
     });
   }
 
-  log(message: string, meta?: any) {
-    this.logger.info(message, meta);
-  }
+  log = (message: string, ...args: unknown[]) => {
+    this.logger.info(message, ...args);
+  };
 
-  error(message: string, trace?: string, meta?: any) {
-    this.logger.error(message, { trace, ...meta });
-  }
+  error = (message: string, ...args: unknown[]) => {
+    this.logger.error(message, ...args);
+  };
 
-  warn(message: string, meta?: any) {
-    this.logger.warn(message, meta);
-  }
+  warn = (message: string, ...args: unknown[]) => {
+    this.logger.warn(message, ...args);
+  };
 
-  debug?(message: string, meta?: any) {
-    this.logger.debug(message, meta);
-  }
+  debug? = (message: string, ...args: unknown[]) => {
+    this.logger.debug(message, ...args);
+  };
 
-  verbose?(message: string, meta?: any) {
-    this.logger.verbose(message, meta);
-  }
+  verbose? = (message: string, ...args: unknown[]) => {
+    this.logger.verbose(message, ...args);
+  };
 }
