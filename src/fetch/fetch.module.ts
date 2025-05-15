@@ -5,6 +5,6 @@ import { LoggerModule } from 'src/logger/logger.module';
 @Module({
   imports: [LoggerModule],
   exports: [FetchService],
-  providers: [FetchService, LoggerModule],
+  providers: [FetchService],
 })
 export class FetchModule {}

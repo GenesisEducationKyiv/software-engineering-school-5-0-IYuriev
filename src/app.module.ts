@@ -3,6 +3,7 @@ import { LoggerModule } from './logger/logger.module';
 import { LoggingMiddleware } from './common/middleware/logger.middleware';
 import { ConfigModule } from '@nestjs/config';
 import { FetchModule } from './fetch/fetch.module';
+import { WeatherModule } from './weather/weather.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { FetchModule } from './fetch/fetch.module';
       isGlobal: true,
     }),
     FetchModule,
+    WeatherModule,
   ],
   controllers: [],
   providers: [],
