@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Subscription {
-  id         String    @id @default(uuid())
+  id         Int    @id @default(autoincrement())
   email      String
   city       String
   frequency  Frequency
@@ -16,24 +16,22 @@ model Subscription {
   tokens     Token[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+
+  @@map("subscription")
 }
 
 model Token {
-  id             String        @id @default(uuid())
+  id             Int        @id @default(autoincrement())
   token          String        @unique
-  type           TokenType
-  subscription   Subscription  @relation(fields: [subscriptionId], references: [id])
-  subscriptionId String
+  subscription   Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  subscriptionId Int
   createdAt      DateTime      @default(now())
   expiresAt      DateTime?
+
+  @@map("token")
 }
 
 enum Frequency {
   hourly
   daily
-}
-
-enum TokenType {
-  confirm
-  unsubscribe
 }
