@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { WeatherData } from '../constants/types/weather.interface';
+import {
+  WeatherData,
+  WeatherResponse,
+} from '../constants/types/weather.interface';
 import { FetchService } from '../fetch/fetch.service';
 import { GetWeatherDto } from './dto/get-weather.dto';
 
@@ -17,7 +20,7 @@ export class WeatherService {
     this.WEATHER_API_URL = this.config.get<string>('WEATHER_API_URL', '');
   }
 
-  async getWeather({ city }: GetWeatherDto) {
+  async getWeather({ city }: GetWeatherDto): Promise<WeatherResponse> {
     const url = `${this.WEATHER_API_URL}?key=${this.API_KEY}&q=${city}&aqi=yes`;
 
     const data = await this.fetchService.get<WeatherData>(url);
