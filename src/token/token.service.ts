@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { TokenType } from 'src/constants/enums/subscription';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -12,12 +11,17 @@ export class TokenService {
     await this.prisma.token.create({
       data: {
         token,
-        type: TokenType.CONFIRM,
         subscriptionId,
         expiresAt: this.getExpiryDate(),
       },
     });
     return token;
+  }
+
+  async getValidToken(token: string) {
+    const dbToken = await this.prisma.token.findUnique({ where: { token } });
+    if (!dbToken) throw new BadRequestException('Invalid token');
+    return dbToken;
   }
 
   private getExpiryDate(): Date {
