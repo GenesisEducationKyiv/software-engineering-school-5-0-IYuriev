@@ -30,4 +30,17 @@ export class EmailService {
       text: `${this.text}${link}`,
     });
   }
+
+  async sendForecastEmail(
+    email: string,
+    subject: string,
+    text: string,
+  ): Promise<void> {
+    await this.transporter.sendMail({
+      from: this.config.get<string>('EMAIL_USER'),
+      to: email,
+      subject,
+      text,
+    });
+  }
 }

@@ -8,6 +8,8 @@ import { SubscriptionModule } from './subscription/subscription.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { EmailModule } from './email/email.module';
 import { TokenModule } from './token/token.module';
+import { NotificationModule } from './notification/notification.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -19,10 +21,12 @@ import { TokenModule } from './token/token.module';
     WeatherModule,
     SubscriptionModule,
     PrismaModule,
-
+    ScheduleModule.forRoot(),
     EmailModule,
 
     TokenModule,
+
+    NotificationModule,
   ],
   controllers: [],
   providers: [],

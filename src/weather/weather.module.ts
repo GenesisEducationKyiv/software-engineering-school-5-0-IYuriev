@@ -4,7 +4,6 @@ import { WeatherController } from './weather.controller';
 import { FetchService } from 'src/fetch/fetch.service';
 
 @Module({
-  imports: [],
   controllers: [WeatherController],
   providers: [WeatherService, FetchService],
 })
