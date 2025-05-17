@@ -14,6 +14,8 @@ import { SubscriptionModule } from './subscription/subscription.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { EmailModule } from './email/email.module';
 import { TokenModule } from './token/token.module';
+import { NotificationModule } from './notification/notification.module';
+import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from './cache/cache.module';
 
 @Module({
@@ -26,8 +28,10 @@ import { CacheModule } from './cache/cache.module';
     WeatherModule,
     SubscriptionModule,
     PrismaModule,
+    ScheduleModule.forRoot(),
     EmailModule,
     TokenModule,
+    NotificationModule,
     CacheModule,
   ],
   controllers: [],
