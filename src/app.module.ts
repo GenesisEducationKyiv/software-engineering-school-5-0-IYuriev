@@ -1,4 +1,10 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
+
 import { LoggerModule } from './logger/logger.module';
 import { LoggingMiddleware } from './common/middleware/logger.middleware';
 import { ConfigModule } from '@nestjs/config';
@@ -10,6 +16,7 @@ import { EmailModule } from './email/email.module';
 import { TokenModule } from './token/token.module';
 import { NotificationModule } from './notification/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CacheModule } from './cache/cache.module';
 
 @Module({
   imports: [
@@ -23,16 +30,17 @@ import { ScheduleModule } from '@nestjs/schedule';
     PrismaModule,
     ScheduleModule.forRoot(),
     EmailModule,
-
     TokenModule,
-
     NotificationModule,
+    CacheModule,
   ],
   controllers: [],
   providers: [],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggingMiddleware).forRoutes('*');
+    consumer
+      .apply(LoggingMiddleware)
+      .forRoutes({ path: '/*api', method: RequestMethod.ALL });
   }
 }
