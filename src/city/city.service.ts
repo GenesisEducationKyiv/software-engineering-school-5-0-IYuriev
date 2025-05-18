@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { WeatherApiEndpoint } from 'src/constants/enums/weather';
-import { ICityResponse } from 'src/constants/types/city.interface';
-import { FetchService } from 'src/fetch/fetch.service';
+import { WeatherApiEndpoint } from '../constants/enums/weather';
+import { ICityResponse } from '../constants/types/city.interface';
+import { FetchService } from '../fetch/fetch.service';
 
 @Injectable()
 export class CityService {

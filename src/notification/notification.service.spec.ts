@@ -6,89 +6,108 @@ import { WeatherService } from '../weather/weather.service';
 import { ConfigService } from '@nestjs/config';
 import { NotificationFrequency } from '../constants/enums/subscription';
 
+const mockPrismaService = {
+  subscription: {
+    findMany: jest.fn(),
+  },
+};
+
+const mockEmailService = {
+  sendForecastEmail: jest.fn(),
+};
+
+const mockWeatherService = {
+  getWeather: jest.fn(),
+};
+
+const mockConfigService = {
+  get: jest.fn(),
+};
+
 describe('NotificationService', () => {
   let service: NotificationService;
-  let prisma: PrismaService;
-  let email: EmailService;
-  let weather: WeatherService;
-  let config: ConfigService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         NotificationService,
-        {
-          provide: PrismaService,
-          useValue: {
-            subscription: {
-              findMany: jest.fn(),
-            },
-          },
-        },
-        {
-          provide: EmailService,
-          useValue: {
-            sendForecastEmail: jest.fn(),
-          },
-        },
-        {
-          provide: WeatherService,
-          useValue: {
-            getWeather: jest.fn(),
-          },
-        },
-        {
-          provide: ConfigService,
-          useValue: {
-            get: jest.fn().mockImplementation((key: string) => {
-              if (key === 'UNSUBSCRIBE_URL') return 'http://unsubscribe.test';
-              return null;
-            }),
-          },
-        },
+        { provide: PrismaService, useValue: mockPrismaService },
+        { provide: EmailService, useValue: mockEmailService },
+        { provide: WeatherService, useValue: mockWeatherService },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
     service = module.get<NotificationService>(NotificationService);
-    prisma = module.get<PrismaService>(PrismaService);
-    email = module.get<EmailService>(EmailService);
-    weather = module.get<WeatherService>(WeatherService);
-    config = module.get<ConfigService>(ConfigService);
+
+    mockConfigService.get.mockReturnValue('https://example.com/unsubscribe');
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-    expect(prisma).toBeDefined();
-    expect(email).toBeDefined();
-    expect(weather).toBeDefined();
-    expect(config).toBeDefined();
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('should call notifySubscribers with HOURLY frequency', async () => {
-    const spy = jest
-      .spyOn<any, any>(service as any, 'notifySubscribers')
-      .mockResolvedValue(undefined);
-    await service.notifyHourly();
-    expect(spy).toHaveBeenCalledWith(NotificationFrequency.HOURLY);
-    spy.mockRestore();
+  describe('notifySubscribers', () => {
+    it('should notify all confirmed subscribers for a given frequency', async () => {
+      mockPrismaService.subscription.findMany.mockResolvedValue([
+        {
+          email: 'test@example.com',
+          city: 'Kyiv',
+          tokens: [{ token: 'abc123' }],
+        },
+      ]);
+
+      mockWeatherService.getWeather.mockResolvedValue({
+        temp: 25,
+        condition: 'Clear',
+      });
+
+      await service['notifySubscribers'](NotificationFrequency.DAILY);
+
+      expect(mockPrismaService.subscription.findMany).toHaveBeenCalledWith({
+        where: { confirmed: true, frequency: NotificationFrequency.DAILY },
+        include: { tokens: true },
+      });
+
+      expect(mockWeatherService.getWeather).toHaveBeenCalledWith({
+        city: 'Kyiv',
+      });
+
+      expect(mockEmailService.sendForecastEmail).toHaveBeenCalledWith(
+        'test@example.com',
+        'Kyiv',
+        expect.stringContaining('Kyiv'), // або перевірити на частковий текст
+      );
+    });
+
+    it('should not throw if no subscribers found', async () => {
+      mockPrismaService.subscription.findMany.mockResolvedValue([]);
+
+      await expect(
+        service['notifySubscribers'](NotificationFrequency.HOURLY),
+      ).resolves.not.toThrow();
+
+      expect(mockEmailService.sendForecastEmail).not.toHaveBeenCalled();
+    });
   });
 
-  it('should call notifySubscribers with DAILY frequency', async () => {
-    const spy = jest
-      .spyOn<any, any>(service as any, 'notifySubscribers')
-      .mockResolvedValue(undefined);
-    await service.notifyDaily();
-    expect(spy).toHaveBeenCalledWith(NotificationFrequency.DAILY);
-    spy.mockRestore();
+  describe('notifyHourly', () => {
+    it('should call notifySubscribers with HOURLY', async () => {
+      const spy = jest
+        .spyOn(service as any, 'notifySubscribers')
+        .mockImplementation();
+      await service.notifyHourly();
+      expect(spy).toHaveBeenCalledWith(NotificationFrequency.HOURLY);
+    });
   });
 
-  it('should do nothing if no subscriptions found', async () => {
-    (prisma.subscription.findMany as jest.Mock).mockResolvedValue([]);
-    const result = await service['notifySubscribers'](
-      NotificationFrequency.HOURLY,
-    );
-    expect(result).toBeUndefined();
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(prisma.subscription.findMany).toHaveBeenCalled();
+  describe('notifyDaily', () => {
+    it('should call notifySubscribers with DAILY', async () => {
+      const spy = jest
+        .spyOn(service as any, 'notifySubscribers')
+        .mockImplementation();
+      await service.notifyDaily();
+      expect(spy).toHaveBeenCalledWith(NotificationFrequency.DAILY);
+    });
   });
 });
