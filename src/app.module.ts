@@ -17,6 +17,7 @@ import { TokenModule } from './token/token.module';
 import { NotificationModule } from './notification/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from './cache/cache.module';
+import { CityModule } from './city/city.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { CacheModule } from './cache/cache.module';
     TokenModule,
     NotificationModule,
     CacheModule,
+    CityModule,
   ],
   controllers: [],
   providers: [],

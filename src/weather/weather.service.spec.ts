@@ -3,7 +3,7 @@ import { WeatherService } from './weather.service';
 import { ConfigService } from '@nestjs/config';
 import { FetchService } from '../fetch/fetch.service';
 import { GetWeatherDto } from './dto/get-weather.dto';
-import { WeatherData } from '../constants/types/weather.interface';
+import { IWeatherData } from '../constants/types/weather.interface';
 
 describe('WeatherService', () => {
   let service: WeatherService;
@@ -19,7 +19,7 @@ describe('WeatherService', () => {
     }),
   };
 
-  const mockWeatherData: WeatherData = {
+  const mockWeatherData: IWeatherData = {
     location: {
       name: 'London',
       region: '',

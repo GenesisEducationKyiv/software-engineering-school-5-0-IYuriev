@@ -1,4 +1,4 @@
-export interface WeatherData {
+export interface IWeatherData {
   location: {
     name: string;
     region: string;
@@ -56,7 +56,7 @@ export interface WeatherData {
   };
 }
 
-export interface WeatherResponse {
+export interface IWeatherResponse {
   temperature: number;
   humidity: number;
   description: string;
