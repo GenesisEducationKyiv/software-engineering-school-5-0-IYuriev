@@ -1,0 +1,12 @@
+FROM node:20-alpine
+WORKDIR /home/node/app
+RUN mkdir -p node_modules dist && chown -R node:node /home/node/app
+COPY package*.json ./
+USER root
+RUN npm install
+RUN chown -R node:node /home/node/app/node_modules
+USER node
+COPY --chown=node:node . .
+RUN npx prisma generate --schema=./prisma/schema.prisma
+EXPOSE 3000
+CMD ["npm", "run", "start:dev"]
