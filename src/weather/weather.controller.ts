@@ -1,4 +1,4 @@
-import { Body, Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { WeatherService } from './weather.service';
 import { GetWeatherDto } from './dto/get-weather.dto';
 
@@ -7,7 +7,7 @@ export class WeatherController {
   constructor(private readonly weatherService: WeatherService) {}
 
   @Get()
-  async getWeather(@Body() dto: GetWeatherDto) {
+  async getWeather(@Query() dto: GetWeatherDto) {
     return await this.weatherService.getWeather(dto);
   }
 }
