@@ -1,9 +1,9 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { EmailService } from 'src/email/email.service';
-import { TokenService } from 'src/token/token.service';
-import { CityService } from 'src/city/city.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { EmailService } from '../email/email.service';
+import { TokenService } from '../token/token.service';
+import { CityService } from '../city/city.service';
 
 @Injectable()
 export class SubscriptionService {

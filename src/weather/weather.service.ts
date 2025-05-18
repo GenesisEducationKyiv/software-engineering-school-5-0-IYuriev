@@ -6,10 +6,10 @@ import {
 } from '../constants/types/weather.interface';
 import { FetchService } from '../fetch/fetch.service';
 import { GetWeatherDto } from './dto/get-weather.dto';
-import { CacheService } from 'src/cache/cache.service';
-import { CacheKey } from 'src/constants/enums/cacheKey';
-import { WeatherApiEndpoint } from 'src/constants/enums/weather';
-import { CityService } from 'src/city/city.service';
+import { CacheService } from '../cache/cache.service';
+import { CacheKey } from '../constants/enums/cacheKey';
+import { WeatherApiEndpoint } from '../constants/enums/weather';
+import { CityService } from '../city/city.service';
 
 @Injectable()
 export class WeatherService {

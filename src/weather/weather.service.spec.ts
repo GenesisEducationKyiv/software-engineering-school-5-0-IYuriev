@@ -1,116 +1,151 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WeatherService } from './weather.service';
-import { ConfigService } from '@nestjs/config';
 import { FetchService } from '../fetch/fetch.service';
-import { GetWeatherDto } from './dto/get-weather.dto';
+import { ConfigService } from '@nestjs/config';
+import { CacheService } from '../cache/cache.service';
+import { CityService } from '../city/city.service';
 import { IWeatherData } from '../constants/types/weather.interface';
 
 describe('WeatherService', () => {
   let service: WeatherService;
-  let fetchService: FetchService;
-  let getSpy: jest.SpyInstance;
+
+  const mockFetchService = {
+    get: jest.fn(),
+  };
 
   const mockConfigService = {
     get: jest.fn((key: string) => {
       if (key === 'API_KEY') return 'test-api-key';
-      if (key === 'WEATHER_API_URL')
-        return 'http://api.weatherapi.com/v1/current.json';
-      return null;
+      if (key === 'WEATHER_API_URL') return 'https://api.weatherapi.com/v1/';
+      return '';
     }),
   };
 
-  const mockWeatherData: IWeatherData = {
-    location: {
-      name: 'London',
-      region: '',
-      country: '',
-      lat: 0,
-      lon: 0,
-      tz_id: '',
-      localtime_epoch: 0,
-      localtime: '',
-    },
-    current: {
-      last_updated_epoch: 1234567890,
-      last_updated: '2025-05-15 12:00',
-      temp_c: 20,
-      temp_f: 68,
-      is_day: 1,
-      condition: {
-        text: 'Sunny',
-        icon: '',
-        code: 1000,
-      },
-      wind_mph: 5,
-      wind_kph: 8,
-      wind_degree: 90,
-      wind_dir: 'E',
-      pressure_mb: 1015,
-      pressure_in: 29.91,
-      precip_mm: 0,
-      precip_in: 0,
-      humidity: 50,
-      cloud: 0,
-      feelslike_c: 20,
-      feelslike_f: 68,
-      vis_km: 10,
-      vis_miles: 6,
-      uv: 5,
-      gust_mph: 7,
-      gust_kph: 11,
-      air_quality: {
-        co: 0.5,
-        no2: 0.1,
-        o3: 0.3,
-        so2: 0.05,
-        pm2_5: 10,
-        pm10: 20,
-        'us-epa-index': 1,
-        'gb-defra-index': 1,
-      },
-      windchill_c: 19,
-      windchill_f: 66,
-      heatindex_c: 21,
-      heatindex_f: 69,
-      dewpoint_c: 12,
-      dewpoint_f: 54,
-    },
+  const mockCacheService = {
+    get: jest.fn(),
+    set: jest.fn(),
   };
 
-  const mockFetchService = {
-    get: jest.fn(function (this: void) {
-      return Promise.resolve(mockWeatherData);
-    }),
+  const mockCityService = {
+    validateCity: jest.fn(),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         WeatherService,
-        { provide: ConfigService, useValue: mockConfigService },
         { provide: FetchService, useValue: mockFetchService },
+        { provide: ConfigService, useValue: mockConfigService },
+        { provide: CacheService, useValue: mockCacheService },
+        { provide: CityService, useValue: mockCityService },
       ],
     }).compile();
 
     service = module.get<WeatherService>(WeatherService);
-    fetchService = module.get<FetchService>(FetchService);
-
-    getSpy = jest.spyOn(fetchService, 'get');
   });
 
-  it('should call FetchService with correct URL and return weather data', async () => {
-    const dto: GetWeatherDto = { city: 'London' };
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-    const result = await service.getWeather(dto);
+  describe('getWeather', () => {
+    const dto = { city: 'Kyiv' };
+    const validatedCity = 'Kyiv';
+    const cacheKey = `weather:${validatedCity}`;
 
-    expect(getSpy).toHaveBeenCalledWith(
-      'http://api.weatherapi.com/v1/current.json?key=test-api-key&q=London&aqi=yes',
-    );
+    const mockApiResponse: IWeatherData = {
+      current: {
+        last_updated_epoch: 0,
+        last_updated: '',
+        temp_c: 18,
+        temp_f: 64.4,
+        is_day: 1,
+        condition: {
+          text: 'Sunny',
+          icon: '',
+          code: 1000,
+        },
+        wind_mph: 0,
+        wind_kph: 0,
+        wind_degree: 0,
+        wind_dir: '',
+        pressure_mb: 0,
+        pressure_in: 0,
+        precip_mm: 0,
+        precip_in: 0,
+        humidity: 55,
+        cloud: 0,
+        feelslike_c: 18,
+        feelslike_f: 64.4,
+        vis_km: 0,
+        vis_miles: 0,
+        uv: 0,
+        gust_mph: 0,
+        gust_kph: 0,
+        air_quality: {
+          co: 0,
+          no2: 0,
+          o3: 0,
+          so2: 0,
+          pm2_5: 0,
+          pm10: 0,
+          'us-epa-index': 0,
+          'gb-defra-index': 0,
+        },
+        windchill_c: 18,
+        windchill_f: 64.4,
+        heatindex_c: 18,
+        heatindex_f: 64.4,
+        dewpoint_c: 10,
+        dewpoint_f: 50,
+      },
+      location: {
+        name: 'Kyiv',
+        region: '',
+        country: '',
+        lat: 0,
+        lon: 0,
+        tz_id: '',
+        localtime_epoch: 0,
+        localtime: '',
+      },
+    };
 
-    expect(result).toEqual({
-      temperature: 20,
-      humidity: 50,
+    const expectedResponse = {
+      temperature: 18,
+      humidity: 55,
       description: 'Sunny',
+    };
+
+    it('should return cached weather data if available', async () => {
+      mockCityService.validateCity.mockResolvedValue(validatedCity);
+      mockCacheService.get.mockResolvedValue(JSON.stringify(expectedResponse));
+
+      const result = await service.getWeather(dto);
+
+      expect(mockCityService.validateCity).toHaveBeenCalledWith(dto.city);
+      expect(mockCacheService.get).toHaveBeenCalledWith(cacheKey);
+      expect(result).toEqual(expectedResponse);
+      expect(mockFetchService.get).not.toHaveBeenCalled();
+    });
+
+    it('should fetch, cache, and return data if not cached', async () => {
+      mockCityService.validateCity.mockResolvedValue(validatedCity);
+      mockCacheService.get.mockResolvedValue(null);
+      mockFetchService.get.mockResolvedValue(mockApiResponse);
+
+      const result = await service.getWeather(dto);
+
+      const expectedUrl = `https://api.weatherapi.com/v1/current.json?key=test-api-key&q=Kyiv&aqi=yes`;
+
+      expect(mockCityService.validateCity).toHaveBeenCalledWith(dto.city);
+      expect(mockCacheService.get).toHaveBeenCalledWith(cacheKey);
+      expect(mockFetchService.get).toHaveBeenCalledWith(expectedUrl);
+      expect(mockCacheService.set).toHaveBeenCalledWith(
+        cacheKey,
+        JSON.stringify(expectedResponse),
+      );
+      expect(result).toEqual(expectedResponse);
     });
   });
 });
