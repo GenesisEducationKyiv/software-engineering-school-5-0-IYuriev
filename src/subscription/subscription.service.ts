@@ -14,7 +14,7 @@ export class SubscriptionService {
 
   async subscribe(dto: CreateSubscriptionDto) {
     const existing = await this.prisma.subscription.findFirst({
-      where: { email: dto.email, city: dto.city },
+      where: { email: dto.email, city: dto.city, frequency: dto.frequency },
     });
     if (existing) throw new ConflictException('Email already subscribed');
 
