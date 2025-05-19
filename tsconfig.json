@@ -9,6 +9,8 @@
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
+    "allowJs": true,
+    "checkJs": false,
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
@@ -17,5 +19,6 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "include": ["src/**/*", "public/**/*.js"]
 }
