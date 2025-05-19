@@ -51,16 +51,6 @@ describe('CacheService', () => {
         300,
       );
     });
-
-    it('should set a value with custom TTL', async () => {
-      await service.set('key2', 'value2', 100);
-      expect(redisClientMock.set).toHaveBeenCalledWith(
-        'key2',
-        'value2',
-        'EX',
-        100,
-      );
-    });
   });
 
   describe('get', () => {

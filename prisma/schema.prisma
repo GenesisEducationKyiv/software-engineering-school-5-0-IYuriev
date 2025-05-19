@@ -26,7 +26,6 @@ model Token {
   subscription   Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
   subscriptionId Int
   createdAt      DateTime      @default(now())
-  expiresAt      DateTime?
 
   @@map("token")
 }

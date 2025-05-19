@@ -3,7 +3,6 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
 import { TokenService } from '../token/token.service';
-import { CityService } from '../city/city.service';
 
 @Injectable()
 export class SubscriptionService {
@@ -11,7 +10,6 @@ export class SubscriptionService {
     private readonly prisma: PrismaService,
     private readonly tokenService: TokenService,
     private readonly emailService: EmailService,
-    private readonly cityService: CityService,
   ) {}
 
   async subscribe(dto: CreateSubscriptionDto) {
@@ -20,11 +18,10 @@ export class SubscriptionService {
     });
     if (existing) throw new ConflictException('Email already subscribed');
 
-    const validCity = await this.cityService.validateCity(dto.city);
     const subscription = await this.prisma.subscription.create({
       data: {
         email: dto.email,
-        city: validCity,
+        city: dto.city,
         frequency: dto.frequency,
       },
     });

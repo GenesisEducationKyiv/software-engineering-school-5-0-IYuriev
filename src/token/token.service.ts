@@ -12,7 +12,6 @@ export class TokenService {
       data: {
         token,
         subscriptionId,
-        expiresAt: this.getExpiryDate(),
       },
     });
     return token;
@@ -22,9 +21,5 @@ export class TokenService {
     const dbToken = await this.prisma.token.findUnique({ where: { token } });
     if (!dbToken) throw new BadRequestException('Invalid token');
     return dbToken;
-  }
-
-  private getExpiryDate(): Date {
-    return new Date(Date.now() + 1000 * 60 * 60 * 24);
   }
 }

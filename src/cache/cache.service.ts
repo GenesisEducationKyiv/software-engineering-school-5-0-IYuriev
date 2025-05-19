@@ -13,12 +13,8 @@ export class CacheService implements OnModuleDestroy {
     this.client = new Redis(redisUrl);
   }
 
-  async set(
-    key: string,
-    value: string,
-    ttl: number = this.DEFAULT_TTL,
-  ): Promise<void> {
-    await this.client.set(key, value, 'EX', ttl);
+  async set(key: string, value: string): Promise<void> {
+    await this.client.set(key, value, 'EX', this.DEFAULT_TTL);
   }
 
   async get(key: string): Promise<string | null> {

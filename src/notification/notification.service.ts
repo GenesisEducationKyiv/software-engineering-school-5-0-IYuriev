@@ -35,7 +35,7 @@ export class NotificationService {
     });
 
     for (const sub of subscriptions) {
-      const weather = await this.weatherService.getWeather({ city: sub.city });
+      const weather = await this.weatherService.getWeather(sub.city);
       const token = sub.tokens[0]?.token;
       const link = `${this.unsubscribeUrl}/${token}`;
       const message = formatWeatherMessage(sub.city, weather, link);
