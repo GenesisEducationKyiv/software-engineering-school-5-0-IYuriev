@@ -76,6 +76,10 @@ Response:
 - **Frontend**: HTML, CSS, JavaScript (lightweight and responsive)
 - **Deployment**: Vercel for seamless hosting
 
+## ⚙️ CI/CD Pipeline
+
+This project includes a GitHub Actions-based **CI/CD pipeline** that automatically runs linting, tests, and builds the application on every push or pull request to the `main` branch. This ensures code quality and prevents regressions before deployment.
+
 ## 🚀 Getting Started
 
 ### Installation
