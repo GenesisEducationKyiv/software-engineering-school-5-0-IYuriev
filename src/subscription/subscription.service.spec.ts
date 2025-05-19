@@ -63,7 +63,7 @@ describe('SubscriptionService', () => {
 
       await expect(service.subscribe(dto)).rejects.toThrow(ConflictException);
       expect(mockPrismaService.subscription.findFirst).toHaveBeenCalledWith({
-        where: { email: dto.email, city: dto.city },
+        where: { email: dto.email, city: dto.city, frequency: dto.frequency },
       });
     });
 
