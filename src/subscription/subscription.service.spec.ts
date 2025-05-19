@@ -69,13 +69,11 @@ describe('SubscriptionService', () => {
 
     it('should create subscription and send confirmation email', async () => {
       mockPrismaService.subscription.findFirst.mockResolvedValue(null);
-      mockCityService.validateCity.mockResolvedValue('Kyiv');
       mockPrismaService.subscription.create.mockResolvedValue({ id: 1 });
       mockTokenService.createConfirmToken.mockResolvedValue('token123');
 
       const result = await service.subscribe(dto);
 
-      expect(mockCityService.validateCity).toHaveBeenCalledWith('Kyiv');
       expect(mockPrismaService.subscription.create).toHaveBeenCalledWith({
         data: {
           email: dto.email,

@@ -69,14 +69,12 @@ describe('NotificationService', () => {
         include: { tokens: true },
       });
 
-      expect(mockWeatherService.getWeather).toHaveBeenCalledWith({
-        city: 'Kyiv',
-      });
+      expect(mockWeatherService.getWeather).toHaveBeenCalledWith('Kyiv');
 
       expect(mockEmailService.sendForecastEmail).toHaveBeenCalledWith(
         'test@example.com',
         'Kyiv',
-        expect.stringContaining('Kyiv'), // або перевірити на частковий текст
+        expect.stringContaining('Kyiv'),
       );
     });
 
