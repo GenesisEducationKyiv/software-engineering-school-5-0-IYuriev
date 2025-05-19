@@ -1,5 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { Server } from 'http';
 import { AppModule } from 'src/app.module';
 import * as request from 'supertest';
 
@@ -22,7 +23,7 @@ describe('Weather (e2e)', () => {
   });
 
   it('should return weather for valid city', async () => {
-    const res = await request(app.getHttpServer())
+    const res = await request(app.getHttpServer() as unknown as Server)
       .get('/api/weather?city=Kyiv')
       .expect(200);
 
@@ -32,7 +33,7 @@ describe('Weather (e2e)', () => {
   });
 
   it('should return 404 for invalid city', async () => {
-    await request(app.getHttpServer())
+    await request(app.getHttpServer() as unknown as Server)
       .get('/api/weather?city=InvalidCityName123')
       .expect(404);
   });

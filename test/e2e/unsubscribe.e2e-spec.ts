@@ -1,6 +1,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { AppModule } from 'src/app.module';
+import { Server } from 'http';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as request from 'supertest';
 
@@ -26,7 +27,7 @@ describe('Unsubscribe (e2e)', () => {
     await prisma.token.deleteMany();
     await prisma.subscription.deleteMany();
 
-    await request(app.getHttpServer())
+    await request(app.getHttpServer() as unknown as Server)
       .post('/api/subscribe')
       .send({ email, city, frequency });
 
@@ -44,7 +45,7 @@ describe('Unsubscribe (e2e)', () => {
   });
 
   it('should unsubscribe with valid token', async () => {
-    const res = await request(app.getHttpServer())
+    const res = await request(app.getHttpServer() as unknown as Server)
       .get(`/api/unsubscribe/${token}`)
       .expect(200);
 
@@ -52,7 +53,7 @@ describe('Unsubscribe (e2e)', () => {
   });
 
   it('should return 400 for invalid token', async () => {
-    await request(app.getHttpServer())
+    await request(app.getHttpServer() as unknown as Server)
       .get('/api/unsubscribe/invalidtoken')
       .expect(400);
   });

@@ -1,5 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { Server } from 'http';
 import { AppModule } from 'src/app.module';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as request from 'supertest';
@@ -32,7 +33,7 @@ describe('Subscribe (e2e)', () => {
   const frequency = 'daily';
 
   it('should subscribe new user', async () => {
-    const res = await request(app.getHttpServer())
+    const res = await request(app.getHttpServer() as unknown as Server)
       .post('/api/subscribe')
       .send({ email, city, frequency })
       .expect(201);
@@ -41,14 +42,14 @@ describe('Subscribe (e2e)', () => {
   });
 
   it('should not allow duplicate subscription', async () => {
-    await request(app.getHttpServer())
+    await request(app.getHttpServer() as unknown as Server)
       .post('/api/subscribe')
       .send({ email, city, frequency })
       .expect(409);
   });
 
   it('should return 400 for invalid city', async () => {
-    await request(app.getHttpServer())
+    await request(app.getHttpServer() as unknown as Server)
       .post('/api/subscribe')
       .send({ email: 'other@example.com', city: 'InvalidCity', frequency })
       .expect(404);

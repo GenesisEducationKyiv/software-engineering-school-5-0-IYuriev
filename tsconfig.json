@@ -20,5 +20,5 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
   },
-  "include": ["src/**/*", "public/**/*.js"]
+  "include": ["src/**/*", "public/**/*.js", "test", "test/**/*.ts"]
 }
