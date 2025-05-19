@@ -19,7 +19,7 @@ describe('EmailService', () => {
   });
 
   beforeEach(async () => {
-    jest.clearAllMocks(); // Сначала очищаем моки
+    jest.clearAllMocks();
 
     const config = {
       EMAIL_USER: 'test@example.com',

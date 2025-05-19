@@ -45,7 +45,6 @@ describe('TokenService', () => {
         data: {
           token: 'mocked-uuid',
           subscriptionId: 123,
-          expiresAt: new Date(fakeNow + 1000 * 60 * 60 * 24),
         },
       });
 

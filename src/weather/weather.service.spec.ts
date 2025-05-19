@@ -121,9 +121,8 @@ describe('WeatherService', () => {
       mockCityService.validateCity.mockResolvedValue(validatedCity);
       mockCacheService.get.mockResolvedValue(JSON.stringify(expectedResponse));
 
-      const result = await service.getWeather(dto);
+      const result = await service.getWeather(dto.city);
 
-      expect(mockCityService.validateCity).toHaveBeenCalledWith(dto.city);
       expect(mockCacheService.get).toHaveBeenCalledWith(cacheKey);
       expect(result).toEqual(expectedResponse);
       expect(mockFetchService.get).not.toHaveBeenCalled();
@@ -134,11 +133,10 @@ describe('WeatherService', () => {
       mockCacheService.get.mockResolvedValue(null);
       mockFetchService.get.mockResolvedValue(mockApiResponse);
 
-      const result = await service.getWeather(dto);
+      const result = await service.getWeather(dto.city);
 
       const expectedUrl = `https://api.weatherapi.com/v1/current.json?key=test-api-key&q=Kyiv&aqi=yes`;
 
-      expect(mockCityService.validateCity).toHaveBeenCalledWith(dto.city);
       expect(mockCacheService.get).toHaveBeenCalledWith(cacheKey);
       expect(mockFetchService.get).toHaveBeenCalledWith(expectedUrl);
       expect(mockCacheService.set).toHaveBeenCalledWith(
