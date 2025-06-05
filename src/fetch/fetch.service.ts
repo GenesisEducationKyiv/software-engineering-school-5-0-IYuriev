@@ -5,7 +5,7 @@ import { WinstonLogger } from '../logger/logger.service';
 export class FetchService {
   constructor(private readonly logger: WinstonLogger) {}
 
-  async get<T = any>(url: string): Promise<T> {
+  async get<T>(url: string): Promise<T> {
     const res = await fetch(url);
 
     if (!res.ok) {
