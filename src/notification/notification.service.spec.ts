@@ -92,7 +92,7 @@ describe('NotificationService', () => {
   describe('notifyHourly', () => {
     it('should call notifySubscribers with HOURLY', async () => {
       const spy = jest
-        .spyOn(service as any, 'notifySubscribers')
+        .spyOn(service, 'notifySubscribers' as keyof NotificationService)
         .mockImplementation();
       await service.notifyHourly();
       expect(spy).toHaveBeenCalledWith(NotificationFrequency.HOURLY);
@@ -102,7 +102,7 @@ describe('NotificationService', () => {
   describe('notifyDaily', () => {
     it('should call notifySubscribers with DAILY', async () => {
       const spy = jest
-        .spyOn(service as any, 'notifySubscribers')
+        .spyOn(service, 'notifySubscribers' as keyof NotificationService)
         .mockImplementation();
       await service.notifyDaily();
       expect(spy).toHaveBeenCalledWith(NotificationFrequency.DAILY);
