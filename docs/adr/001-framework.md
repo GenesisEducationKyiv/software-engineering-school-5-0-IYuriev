@@ -49,6 +49,26 @@ It is necessary to choose a backend framework for implementing:
 - Smaller ecosystem compared to Express/NestJS
 - Less documentation and community support
 
+### 4. AdonisJS (Node.js)
+**Pros:**
+- Full-featured framework with built-in ORM, authentication, CLI, and migrations
+- Clear project structure
+- TypeScript support
+
+**Cons:**
+- Smaller ecosystem and community compared to NestJS
+- Fewer learning resources
+
+### 5. Next.js (Node.js)
+**Pros:**
+- SSR/SSG for frontend
+- API routes for backend
+- Fast start for full-stack projects
+
+**Cons:**
+- Not specialized for complex backend APIs
+- Fewer backend-specific features (DI, modularity, advanced testing)
+
 ## Decision
 
 **NestJS** was chosen as the main backend framework.
