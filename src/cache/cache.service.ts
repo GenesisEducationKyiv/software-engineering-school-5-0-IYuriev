@@ -1,11 +1,12 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
+import { ICacheService } from 'src/cache/interfaces/cache-service.inteface';
+import { CacheTTL } from 'src/constants/enums/cache';
 
 @Injectable()
-export class CacheService implements OnModuleDestroy {
+export class RedisCacheService implements OnModuleDestroy, ICacheService {
   private readonly client: Redis;
-  private DEFAULT_TTL = 300;
 
   constructor(private readonly config: ConfigService) {
     const redisUrl = this.config.get<string>('REDIS_URL');
@@ -14,7 +15,7 @@ export class CacheService implements OnModuleDestroy {
   }
 
   async set(key: string, value: string): Promise<void> {
-    await this.client.set(key, value, 'EX', this.DEFAULT_TTL);
+    await this.client.set(key, value, 'EX', CacheTTL.FIVE_MINUTES);
   }
 
   async get(key: string): Promise<string | null> {
