@@ -15,7 +15,6 @@ import { EmailServiceToken } from './interfaces/email-service.interface';
       provide: EmailServiceToken,
       useClass: EmailService,
     },
-    NodemailerService,
   ],
   exports: [EmailTransportToken, EmailServiceToken],
 })

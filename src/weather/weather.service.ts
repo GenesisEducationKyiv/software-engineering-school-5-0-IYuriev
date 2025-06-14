@@ -5,7 +5,7 @@ import { CacheKey } from '../constants/enums/cache';
 import {
   CacheServiceToken,
   ICacheService,
-} from 'src/cache/interfaces/cache-service.inteface';
+} from 'src/cache/interfaces/cache-service.interface';
 import {
   IWeatherClientService,
   WeatherClientServiceToken,

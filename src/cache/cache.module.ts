@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { CacheServiceToken } from './interfaces/cache-service.inteface';
+import { CacheServiceToken } from './interfaces/cache-service.interface';
 import { RedisCacheService } from './cache.service';
 
 @Module({
