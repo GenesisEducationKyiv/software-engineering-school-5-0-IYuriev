@@ -18,6 +18,8 @@ import { NotificationModule } from './notification/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from './cache/cache.module';
 import { CityModule } from './city/city.module';
+import { NodemailerModule } from './nodemailer/nodemailer.module';
+import { WeatherClientModule } from './weather-client/weather-client.module';
 
 @Module({
   imports: [
@@ -35,6 +37,8 @@ import { CityModule } from './city/city.module';
     NotificationModule,
     CacheModule,
     CityModule,
+    NodemailerModule,
+    WeatherClientModule,
   ],
   controllers: [],
   providers: [],

@@ -1,0 +1,16 @@
+import { Module } from '@nestjs/common';
+import { WeatherClientService } from './weather-client.service';
+import { FetchModule } from 'src/fetch/fetch.module';
+import { WeatherClientServiceToken } from './interfaces/weather-service.interface';
+
+@Module({
+  imports: [FetchModule],
+  providers: [
+    {
+      provide: WeatherClientServiceToken,
+      useClass: WeatherClientService,
+    },
+  ],
+  exports: [WeatherClientServiceToken],
+})
+export class WeatherClientModule {}
