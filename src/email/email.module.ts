@@ -7,13 +7,14 @@ import { EmailServiceToken } from './interfaces/email-service.interface';
 @Module({
   providers: [
     EmailService,
+    NodemailerService,
     {
       provide: EmailTransportToken,
-      useClass: NodemailerService,
+      useExisting: NodemailerService,
     },
     {
       provide: EmailServiceToken,
-      useClass: EmailService,
+      useExisting: EmailService,
     },
   ],
   exports: [EmailTransportToken, EmailServiceToken],

@@ -7,11 +7,10 @@ import { FetchModule } from 'src/fetch/fetch.module';
 import { CacheModule } from 'src/cache/cache.module';
 import { CityModule } from 'src/city/city.module';
 import { EmailModule } from 'src/email/email.module';
-import { SubscriptionRepository } from 'src/subscription/subscription.repository';
 import { NotificationRepository } from './notification.repository';
-import { SubscriptionRepositoryToken } from 'src/subscription/interfaces/subscription-repoository.interface';
 import { NotificationRepositoryToken } from './interfaces/notification-repository.interface';
 import { WeatherClientModule } from 'src/weather-client/weather-client.module';
+import { SubscriptionModule } from 'src/subscription/subscription.module';
 
 @Module({
   imports: [
@@ -20,23 +19,18 @@ import { WeatherClientModule } from 'src/weather-client/weather-client.module';
     CityModule,
     EmailModule,
     WeatherClientModule,
+    SubscriptionModule,
   ],
-  exports: [NotificationService],
   providers: [
     NotificationService,
     PrismaService,
     EmailService,
     WeatherService,
-    {
-      provide: SubscriptionRepositoryToken,
-      useClass: SubscriptionRepository,
-    },
+    NotificationRepository,
     {
       provide: NotificationRepositoryToken,
-      useClass: NotificationRepository,
+      useExisting: NotificationRepository,
     },
-    SubscriptionRepository,
-    NotificationRepository,
   ],
 })
 export class NotificationModule {}

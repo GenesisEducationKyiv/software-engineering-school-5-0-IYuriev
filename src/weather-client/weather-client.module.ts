@@ -6,9 +6,10 @@ import { WeatherClientServiceToken } from './interfaces/weather-service.interfac
 @Module({
   imports: [FetchModule],
   providers: [
+    WeatherClientService,
     {
       provide: WeatherClientServiceToken,
-      useClass: WeatherClientService,
+      useExisting: WeatherClientService,
     },
   ],
   exports: [WeatherClientServiceToken],

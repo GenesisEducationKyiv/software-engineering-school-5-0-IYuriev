@@ -12,11 +12,11 @@ import { TokenServiceToken } from './interfaces/token-service.interface';
     TokenRepository,
     {
       provide: TokenRepositoryToken,
-      useClass: TokenRepository,
+      useExisting: TokenRepository,
     },
     {
       provide: TokenServiceToken,
-      useClass: TokenService,
+      useExisting: TokenService,
     },
   ],
   exports: [TokenServiceToken, TokenRepositoryToken],
