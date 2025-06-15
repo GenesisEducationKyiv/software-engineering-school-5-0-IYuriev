@@ -1,51 +1,49 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
-import { PrismaService } from '../prisma/prisma.service';
-import { EmailService } from '../email/email.service';
-import { TokenService } from '../token/token.service';
+import {
+  ISubscriptionRepository,
+  SubscriptionRepositoryToken,
+} from './interfaces/subscription-repoository.interface';
+import {
+  EmailServiceToken,
+  IEmailService,
+} from 'src/email/interfaces/email-service.interface';
+import {
+  ITokenService,
+  TokenServiceToken,
+} from 'src/token/interfaces/token-service.interface';
+import { ISubscriptionService } from './interfaces/subscription-service.interface';
 
 @Injectable()
-export class SubscriptionService {
+export class SubscriptionService implements ISubscriptionService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly tokenService: TokenService,
-    private readonly emailService: EmailService,
+    @Inject(SubscriptionRepositoryToken)
+    private readonly subscriptionRepo: ISubscriptionRepository,
+    @Inject(EmailServiceToken) private readonly emailService: IEmailService,
+    @Inject(TokenServiceToken) private readonly tokenService: ITokenService,
   ) {}
 
-  async subscribe(dto: CreateSubscriptionDto) {
-    const existing = await this.prisma.subscription.findFirst({
-      where: { email: dto.email, city: dto.city, frequency: dto.frequency },
-    });
+  async subscribe(dto: CreateSubscriptionDto): Promise<{ message: string }> {
+    const existing = await this.subscriptionRepo.findSubscription(dto);
     if (existing) throw new ConflictException('Email already subscribed');
 
-    const subscription = await this.prisma.subscription.create({
-      data: {
-        email: dto.email,
-        city: dto.city,
-        frequency: dto.frequency,
-      },
-    });
+    const subscription = await this.subscriptionRepo.create(dto);
     const token = await this.tokenService.createConfirmToken(subscription.id);
-    await this.emailService.sendEmail(dto.email, token);
+    await this.emailService.sendConfirmationEmail(dto.email, token);
 
     return { message: 'Subscription successful. Confirmation email sent.' };
   }
 
-  async confirm(token: string) {
+  async confirm(token: string): Promise<{ message: string }> {
     const dbToken = await this.tokenService.getValidToken(token);
-    await this.prisma.subscription.update({
-      where: { id: dbToken.subscriptionId },
-      data: { confirmed: true },
-    });
+    await this.subscriptionRepo.confirm(dbToken.subscriptionId);
 
     return { message: 'Subscription confirmed successfully' };
   }
 
-  async unsubscribe(token: string) {
+  async unsubscribe(token: string): Promise<{ message: string }> {
     const dbToken = await this.tokenService.getValidToken(token);
-    await this.prisma.subscription.delete({
-      where: { id: dbToken.subscriptionId },
-    });
+    await this.subscriptionRepo.delete(dbToken.subscriptionId);
 
     return { message: 'Unsubscribed successfully' };
   }

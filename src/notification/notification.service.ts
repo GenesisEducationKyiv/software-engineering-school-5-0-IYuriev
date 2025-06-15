@@ -1,46 +1,42 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, Inject } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { NotificationFrequency } from '../constants/enums/subscription';
-import { EmailService } from '../email/email.service';
-import { PrismaService } from '../prisma/prisma.service';
-import { formatWeatherMessage } from '../utils/notification/notification.format';
-import { WeatherService } from '../weather/weather.service';
+import {
+  ISubscriptionRepository,
+  SubscriptionRepositoryToken,
+} from 'src/subscription/interfaces/subscription-repoository.interface';
+import {
+  INotificationRepository,
+  NotificationRepositoryToken,
+} from './interfaces/notification-repository.interface';
+import { INotificationService } from './interfaces/notification-service.interface';
 
 @Injectable()
-export class NotificationService {
-  private readonly unsubscribeUrl = this.config.get<string>('UNSUBSCRIBE_URL');
-
+export class NotificationService implements INotificationService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly emailService: EmailService,
-    private readonly weatherService: WeatherService,
-    private readonly config: ConfigService,
+    @Inject(SubscriptionRepositoryToken)
+    private readonly subscriptionRepo: ISubscriptionRepository,
+    @Inject(NotificationRepositoryToken)
+    private readonly notificationRepo: INotificationRepository,
   ) {}
 
   @Cron(CronExpression.EVERY_HOUR)
-  async notifyHourly() {
+  async notifyHourly(): Promise<void> {
     await this.notifySubscribers(NotificationFrequency.HOURLY);
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_8AM)
-  async notifyDaily() {
+  async notifyDaily(): Promise<void> {
     await this.notifySubscribers(NotificationFrequency.DAILY);
   }
 
-  private async notifySubscribers(frequency: NotificationFrequency) {
-    const subscriptions = await this.prisma.subscription.findMany({
-      where: { confirmed: true, frequency },
-      include: { tokens: true },
-    });
-
+  private async notifySubscribers(
+    frequency: NotificationFrequency,
+  ): Promise<void> {
+    const subscriptions =
+      await this.subscriptionRepo.getConfirmedSubscriptions(frequency);
     for (const sub of subscriptions) {
-      const weather = await this.weatherService.getWeather(sub.city);
-      const token = sub.tokens[0]?.token;
-      const link = `${this.unsubscribeUrl}/${token}`;
-      const message = formatWeatherMessage(sub.city, weather, link);
-
-      await this.emailService.sendForecastEmail(sub.email, sub.city, message);
+      await this.notificationRepo.send(sub);
     }
   }
 }
