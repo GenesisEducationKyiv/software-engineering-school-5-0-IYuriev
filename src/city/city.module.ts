@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { CityService } from './city.service';
 import { FetchService } from 'src/fetch/fetch.service';
-import { WeatherClientService } from 'src/weather-client/weather-client.service';
+import { WeatherClientModule } from 'src/weather-client/weather-client.module';
 
 @Module({
-  providers: [CityService, FetchService, WeatherClientService],
+  imports: [WeatherClientModule],
+  providers: [CityService, FetchService],
   exports: [CityService],
 })
 export class CityModule {}
