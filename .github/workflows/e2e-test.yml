@@ -2,11 +2,7 @@ name: E2E Test Pipeline
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+
 jobs:
   e2e-test:
     runs-on: ubuntu-latest
