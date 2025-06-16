@@ -20,5 +20,12 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
   },
-  "include": ["src/**/*", "public/**/*.js", "test", "test/**/*.ts"]
+  "include": [
+    "src/**/*",
+    "public/**/*.js",
+    "test",
+    "test/**/*.ts",
+    "playwright.config.ts",
+    "jest.integration.config.js"
+  ]
 }
