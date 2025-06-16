@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { NotificationFrequency } from 'src/constants/enums/subscription';
+import { NotificationFrequency } from '../../constants/enums/subscription';
 
 export class CreateSubscriptionDto {
   @IsNotEmpty()

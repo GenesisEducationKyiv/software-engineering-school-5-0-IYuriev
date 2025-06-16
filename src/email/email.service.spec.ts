@@ -1,90 +1,110 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EmailService } from './email.service';
 import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
 import { Email } from '../constants/enums/email';
-
-jest.mock('nodemailer');
+import { EmailTransportToken } from './interfaces/email-transport.interface';
+import { IEmailPayload } from 'src/constants/types/email.interface';
 
 describe('EmailService', () => {
   let service: EmailService;
-
-  const sendMailMock = jest.fn().mockResolvedValue(undefined);
-  const createTransportMock = jest.fn().mockReturnValue({
-    sendMail: sendMailMock,
-  });
-
-  beforeAll(() => {
-    (nodemailer.createTransport as jest.Mock) = createTransportMock;
-  });
+  let mockEmailTransport: { sendMail: jest.Mock };
+  let mockConfigService: { get: jest.Mock };
 
   beforeEach(async () => {
-    jest.clearAllMocks();
-
-    const config = {
-      EMAIL_USER: 'test@example.com',
-      EMAIL_PASS: 'pass123',
-      CONFIRMATION_URL: 'https://confirm.url',
+    mockEmailTransport = {
+      sendMail: jest.fn().mockResolvedValue(undefined),
     };
-
-    const mockConfigService = {
-      get: jest.fn((key: keyof typeof config) => config[key]),
+    mockConfigService = {
+      get: jest.fn((key: string) => {
+        if (key === 'CONFIRMATION_URL') return 'http://localhost/confirm';
+        if (key === 'EMAIL_USER') return 'sender@example.com';
+        return undefined;
+      }),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         EmailService,
-        {
-          provide: ConfigService,
-          useValue: mockConfigService,
-        },
+        { provide: EmailTransportToken, useValue: mockEmailTransport },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
     service = module.get<EmailService>(EmailService);
   });
 
-  it('should create transporter with correct config', () => {
-    expect(nodemailer.createTransport).toHaveBeenCalledWith({
-      service: Email.SERVICE,
-      auth: {
-        user: 'test@example.com',
-        pass: 'pass123',
-      },
-    });
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  describe('sendEmail', () => {
-    it('should send email with correct params', async () => {
-      const email = 'recipient@example.com';
-      const token = 'some-token';
-      const expectedLink = `https://confirm.url/${token}`;
+  describe('sendConfirmationEmail', () => {
+    it('should send confirmation email with correct params', async () => {
+      const email = 'user@example.com';
+      const token = 'sometoken';
 
       await service.sendConfirmationEmail(email, token);
 
-      expect(sendMailMock).toHaveBeenCalledWith({
-        from: 'test@example.com',
+      expect(mockEmailTransport.sendMail).toHaveBeenCalledWith({
+        from: 'sender@example.com',
         to: email,
         subject: Email.SUBJECT,
-        text: `${Email.TEXT}${expectedLink}`,
+        text: `${Email.TEXT}http://localhost/confirm/${token}`,
       });
+    });
+
+    it('should propagate errors from emailTransport', async () => {
+      mockEmailTransport.sendMail.mockRejectedValueOnce(new Error('fail'));
+      await expect(
+        service.sendConfirmationEmail('fail@example.com', 'token'),
+      ).rejects.toThrow('fail');
     });
   });
 
   describe('sendForecastEmail', () => {
-    it('should send forecast email with given subject and text', async () => {
-      const email = 'recipient@example.com';
-      const subject = 'Weather Forecast';
-      const text = 'Sunny with chance of rain';
+    it('should send forecast email with correct payload', async () => {
+      const payload: IEmailPayload = {
+        to: 'forecast@example.com',
+        subject: 'Weather Update',
+        text: 'Today is sunny!',
+      };
 
-      await service.sendForecastEmail(email, subject, text);
+      await service.sendForecastEmail(payload);
 
-      expect(sendMailMock).toHaveBeenCalledWith({
-        from: 'test@example.com',
-        to: email,
-        subject,
-        text,
+      expect(mockEmailTransport.sendMail).toHaveBeenCalledWith({
+        from: 'sender@example.com',
+        ...payload,
       });
+    });
+
+    it('should use empty string as from if EMAIL_USER is missing', async () => {
+      mockConfigService.get = jest.fn((key: string) =>
+        key === 'EMAIL_USER' ? undefined : 'http://localhost/confirm',
+      );
+      const payload: IEmailPayload = {
+        to: 'missing@example.com',
+        subject: 'No From',
+        text: 'No sender',
+      };
+
+      await service.sendForecastEmail(payload);
+
+      expect(mockEmailTransport.sendMail).toHaveBeenCalledWith({
+        from: '',
+        ...payload,
+      });
+    });
+
+    it('should propagate errors from emailTransport', async () => {
+      mockEmailTransport.sendMail.mockRejectedValueOnce(
+        new Error('send error'),
+      );
+      await expect(
+        service.sendForecastEmail({
+          to: 'fail@example.com',
+          subject: 'fail',
+          text: 'fail',
+        }),
+      ).rejects.toThrow('send error');
     });
   });
 });

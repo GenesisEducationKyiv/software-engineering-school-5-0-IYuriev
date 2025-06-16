@@ -1,8 +1,8 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
-import { ICacheService } from 'src/cache/interfaces/cache-service.interface';
-import { CacheTTL } from 'src/constants/enums/cache';
+import { ICacheService } from '../cache/interfaces/cache-service.interface';
+import { CacheTTL } from '../constants/enums/cache';
 
 @Injectable()
 export class RedisCacheService implements OnModuleDestroy, ICacheService {

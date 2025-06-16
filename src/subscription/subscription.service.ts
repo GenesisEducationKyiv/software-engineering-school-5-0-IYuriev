@@ -7,11 +7,11 @@ import {
 import {
   EmailServiceToken,
   IEmailService,
-} from 'src/email/interfaces/email-service.interface';
+} from '../email/interfaces/email-service.interface';
 import {
   ITokenService,
   TokenServiceToken,
-} from 'src/token/interfaces/token-service.interface';
+} from '../token/interfaces/token-service.interface';
 import { ISubscriptionService } from './interfaces/subscription-service.interface';
 
 @Injectable()

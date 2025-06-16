@@ -5,7 +5,7 @@ import {
   TokenRepositoryToken,
 } from './interfaces/token-repository.interface';
 import { ITokenService } from './interfaces/token-service.interface';
-import { IToken } from 'src/constants/types/token.interface';
+import { IToken } from '../constants/types/token.interface';
 
 @Injectable()
 export class TokenService implements ITokenService {

@@ -1,111 +1,90 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationService } from './notification.service';
-import { PrismaService } from '../prisma/prisma.service';
-import { EmailService } from '../email/email.service';
-import { WeatherService } from '../weather/weather.service';
-import { ConfigService } from '@nestjs/config';
 import { NotificationFrequency } from '../constants/enums/subscription';
-
-const mockPrismaService = {
-  subscription: {
-    findMany: jest.fn(),
-  },
-};
-
-const mockEmailService = {
-  sendForecastEmail: jest.fn(),
-};
-
-const mockWeatherService = {
-  getWeather: jest.fn(),
-};
-
-const mockConfigService = {
-  get: jest.fn(),
-};
+import { SubscriptionRepositoryToken } from '../subscription/interfaces/subscription-repoository.interface';
+import { NotificationRepositoryToken } from './interfaces/notification-repository.interface';
 
 describe('NotificationService', () => {
   let service: NotificationService;
+  let mockSubscriptionRepo: { getConfirmedSubscriptions: jest.Mock };
+  let mockNotificationRepo: { send: jest.Mock };
 
   beforeEach(async () => {
+    mockSubscriptionRepo = {
+      getConfirmedSubscriptions: jest.fn(),
+    };
+    mockNotificationRepo = {
+      send: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         NotificationService,
-        { provide: PrismaService, useValue: mockPrismaService },
-        { provide: EmailService, useValue: mockEmailService },
-        { provide: WeatherService, useValue: mockWeatherService },
-        { provide: ConfigService, useValue: mockConfigService },
+        {
+          provide: SubscriptionRepositoryToken,
+          useValue: mockSubscriptionRepo,
+        },
+        {
+          provide: NotificationRepositoryToken,
+          useValue: mockNotificationRepo,
+        },
       ],
     }).compile();
 
     service = module.get<NotificationService>(NotificationService);
-
-    mockConfigService.get.mockReturnValue('https://example.com/unsubscribe');
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('notifySubscribers', () => {
-    it('should notify all confirmed subscribers for a given frequency', async () => {
-      mockPrismaService.subscription.findMany.mockResolvedValue([
-        {
-          email: 'test@example.com',
-          city: 'Kyiv',
-          tokens: [{ token: 'abc123' }],
-        },
-      ]);
+  it('should call getConfirmedSubscriptions and send for each subscription', async () => {
+    const fakeSubs = [{ id: 1 }, { id: 2 }];
+    mockSubscriptionRepo.getConfirmedSubscriptions.mockResolvedValue(fakeSubs);
 
-      mockWeatherService.getWeather.mockResolvedValue({
-        temp: 25,
-        condition: 'Clear',
-      });
+    await service['notifySubscribers'](NotificationFrequency.DAILY);
 
-      await service['notifySubscribers'](NotificationFrequency.DAILY);
-
-      expect(mockPrismaService.subscription.findMany).toHaveBeenCalledWith({
-        where: { confirmed: true, frequency: NotificationFrequency.DAILY },
-        include: { tokens: true },
-      });
-
-      expect(mockWeatherService.getWeather).toHaveBeenCalledWith('Kyiv');
-
-      expect(mockEmailService.sendForecastEmail).toHaveBeenCalledWith(
-        'test@example.com',
-        'Kyiv',
-        expect.stringContaining('Kyiv'),
-      );
-    });
-
-    it('should not throw if no subscribers found', async () => {
-      mockPrismaService.subscription.findMany.mockResolvedValue([]);
-
-      await expect(
-        service['notifySubscribers'](NotificationFrequency.HOURLY),
-      ).resolves.not.toThrow();
-
-      expect(mockEmailService.sendForecastEmail).not.toHaveBeenCalled();
-    });
+    expect(mockSubscriptionRepo.getConfirmedSubscriptions).toHaveBeenCalledWith(
+      NotificationFrequency.DAILY,
+    );
+    expect(mockNotificationRepo.send).toHaveBeenCalledTimes(fakeSubs.length);
+    expect(mockNotificationRepo.send).toHaveBeenCalledWith(fakeSubs[0]);
+    expect(mockNotificationRepo.send).toHaveBeenCalledWith(fakeSubs[1]);
   });
 
-  describe('notifyHourly', () => {
-    it('should call notifySubscribers with HOURLY', async () => {
-      const spy = jest
-        .spyOn(service, 'notifySubscribers' as keyof NotificationService)
-        .mockImplementation();
-      await service.notifyHourly();
-      expect(spy).toHaveBeenCalledWith(NotificationFrequency.HOURLY);
-    });
+  it('should handle empty subscriptions gracefully', async () => {
+    mockSubscriptionRepo.getConfirmedSubscriptions.mockResolvedValue([]);
+
+    await expect(
+      service['notifySubscribers'](NotificationFrequency.HOURLY),
+    ).resolves.not.toThrow();
+    expect(mockNotificationRepo.send).not.toHaveBeenCalled();
   });
 
-  describe('notifyDaily', () => {
-    it('should call notifySubscribers with DAILY', async () => {
-      const spy = jest
-        .spyOn(service, 'notifySubscribers' as keyof NotificationService)
-        .mockImplementation();
-      await service.notifyDaily();
-      expect(spy).toHaveBeenCalledWith(NotificationFrequency.DAILY);
-    });
+  it('should propagate errors from notificationRepo.send', async () => {
+    mockSubscriptionRepo.getConfirmedSubscriptions.mockResolvedValue([
+      { id: 1 },
+    ]);
+    mockNotificationRepo.send.mockRejectedValueOnce(new Error('fail'));
+
+    await expect(
+      service['notifySubscribers'](NotificationFrequency.DAILY),
+    ).rejects.toThrow('fail');
+  });
+
+  it('notifyHourly should call notifySubscribers with HOURLY', async () => {
+    const spy = jest
+      .spyOn(service, 'notifySubscribers' as keyof NotificationService)
+      .mockResolvedValue(undefined);
+    await service.notifyHourly();
+    expect(spy).toHaveBeenCalledWith(NotificationFrequency.HOURLY);
+  });
+
+  it('notifyDaily should call notifySubscribers with DAILY', async () => {
+    const spy = jest
+      .spyOn(service, 'notifySubscribers' as keyof NotificationService)
+      .mockResolvedValue(undefined);
+    await service.notifyDaily();
+    expect(spy).toHaveBeenCalledWith(NotificationFrequency.DAILY);
   });
 });

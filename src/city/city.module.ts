@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CityService } from './city.service';
-import { FetchService } from 'src/fetch/fetch.service';
-import { WeatherClientModule } from 'src/weather-client/weather-client.module';
+import { FetchService } from '../fetch/fetch.service';
+import { WeatherClientModule } from '../weather-client/weather-client.module';
 
 @Module({
   imports: [WeatherClientModule],

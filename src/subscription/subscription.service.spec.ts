@@ -1,45 +1,59 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SubscriptionService } from './subscription.service';
-import { PrismaService } from '../prisma/prisma.service';
-import { EmailService } from '../email/email.service';
-import { TokenService } from '../token/token.service';
-import { CityService } from '../city/city.service';
 import { ConflictException } from '@nestjs/common';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { NotificationFrequency } from '../constants/enums/subscription';
+import { SubscriptionRepositoryToken } from './interfaces/subscription-repoository.interface';
+import { EmailServiceToken } from '../email/interfaces/email-service.interface';
+import { TokenServiceToken } from '../token/interfaces/token-service.interface';
+import { CityService } from '../city/city.service';
 
 describe('SubscriptionService', () => {
   let service: SubscriptionService;
-
-  const mockPrismaService = {
-    subscription: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
+  let mockSubscriptionRepo: {
+    findSubscription: jest.Mock;
+    create: jest.Mock;
+    confirm: jest.Mock;
+    delete: jest.Mock;
   };
-
-  const mockTokenService = {
-    createConfirmToken: jest.fn(),
-    getValidToken: jest.fn(),
+  let mockTokenService: {
+    createConfirmToken: jest.Mock;
+    getValidToken: jest.Mock;
   };
-
-  const mockEmailService = {
-    sendEmail: jest.fn(),
+  let mockEmailService: {
+    sendEmail: jest.Mock;
+    sendConfirmationEmail: jest.Mock;
   };
-
-  const mockCityService = {
-    validateCity: jest.fn(),
-  };
+  let mockCityService: { validateCity: jest.Mock };
 
   beforeEach(async () => {
+    mockSubscriptionRepo = {
+      findSubscription: jest.fn(),
+      create: jest.fn(),
+      confirm: jest.fn(),
+      delete: jest.fn(),
+    };
+    mockTokenService = {
+      createConfirmToken: jest.fn(),
+      getValidToken: jest.fn(),
+    };
+    mockEmailService = {
+      sendEmail: jest.fn(),
+      sendConfirmationEmail: jest.fn(),
+    };
+    mockCityService = {
+      validateCity: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SubscriptionService,
-        { provide: PrismaService, useValue: mockPrismaService },
-        { provide: TokenService, useValue: mockTokenService },
-        { provide: EmailService, useValue: mockEmailService },
+        {
+          provide: SubscriptionRepositoryToken,
+          useValue: mockSubscriptionRepo,
+        },
+        { provide: TokenServiceToken, useValue: mockTokenService },
+        { provide: EmailServiceToken, useValue: mockEmailService },
         { provide: CityService, useValue: mockCityService },
       ],
     }).compile();
@@ -59,30 +73,22 @@ describe('SubscriptionService', () => {
     };
 
     it('should throw if subscription already exists', async () => {
-      mockPrismaService.subscription.findFirst.mockResolvedValue({ id: 1 });
+      mockSubscriptionRepo.findSubscription.mockResolvedValue({ id: 1 });
 
       await expect(service.subscribe(dto)).rejects.toThrow(ConflictException);
-      expect(mockPrismaService.subscription.findFirst).toHaveBeenCalledWith({
-        where: { email: dto.email, city: dto.city, frequency: dto.frequency },
-      });
+      expect(mockSubscriptionRepo.findSubscription).toHaveBeenCalledWith(dto);
     });
 
     it('should create subscription and send confirmation email', async () => {
-      mockPrismaService.subscription.findFirst.mockResolvedValue(null);
-      mockPrismaService.subscription.create.mockResolvedValue({ id: 1 });
+      mockSubscriptionRepo.findSubscription.mockResolvedValue(null);
+      mockSubscriptionRepo.create.mockResolvedValue({ id: 1 });
       mockTokenService.createConfirmToken.mockResolvedValue('token123');
 
       const result = await service.subscribe(dto);
 
-      expect(mockPrismaService.subscription.create).toHaveBeenCalledWith({
-        data: {
-          email: dto.email,
-          city: 'Kyiv',
-          frequency: dto.frequency,
-        },
-      });
+      expect(mockSubscriptionRepo.create).toHaveBeenCalledWith(dto);
       expect(mockTokenService.createConfirmToken).toHaveBeenCalledWith(1);
-      expect(mockEmailService.sendEmail).toHaveBeenCalledWith(
+      expect(mockEmailService.sendConfirmationEmail).toHaveBeenCalledWith(
         'test@example.com',
         'token123',
       );
@@ -90,40 +96,39 @@ describe('SubscriptionService', () => {
         message: 'Subscription successful. Confirmation email sent.',
       });
     });
-  });
 
-  describe('confirm', () => {
-    it('should confirm subscription with valid token', async () => {
-      mockTokenService.getValidToken.mockResolvedValue({ subscriptionId: 42 });
+    describe('confirm', () => {
+      it('should confirm subscription with valid token', async () => {
+        mockTokenService.getValidToken.mockResolvedValue({
+          subscriptionId: 42,
+        });
 
-      const result = await service.confirm('valid_token');
+        const result = await service.confirm('valid_token');
 
-      expect(mockTokenService.getValidToken).toHaveBeenCalledWith(
-        'valid_token',
-      );
-      expect(mockPrismaService.subscription.update).toHaveBeenCalledWith({
-        where: { id: 42 },
-        data: { confirmed: true },
-      });
-      expect(result).toEqual({
-        message: 'Subscription confirmed successfully',
+        expect(mockTokenService.getValidToken).toHaveBeenCalledWith(
+          'valid_token',
+        );
+        expect(mockSubscriptionRepo.confirm).toHaveBeenCalledWith(42);
+        expect(result).toEqual({
+          message: 'Subscription confirmed successfully',
+        });
       });
     });
-  });
 
-  describe('unsubscribe', () => {
-    it('should delete subscription with valid token', async () => {
-      mockTokenService.getValidToken.mockResolvedValue({ subscriptionId: 99 });
+    describe('unsubscribe', () => {
+      it('should delete subscription with valid token', async () => {
+        mockTokenService.getValidToken.mockResolvedValue({
+          subscriptionId: 99,
+        });
 
-      const result = await service.unsubscribe('valid_token');
+        const result = await service.unsubscribe('valid_token');
 
-      expect(mockTokenService.getValidToken).toHaveBeenCalledWith(
-        'valid_token',
-      );
-      expect(mockPrismaService.subscription.delete).toHaveBeenCalledWith({
-        where: { id: 99 },
+        expect(mockTokenService.getValidToken).toHaveBeenCalledWith(
+          'valid_token',
+        );
+        expect(mockSubscriptionRepo.delete).toHaveBeenCalledWith(99);
+        expect(result).toEqual({ message: 'Unsubscribed successfully' });
       });
-      expect(result).toEqual({ message: 'Unsubscribed successfully' });
     });
   });
 });
