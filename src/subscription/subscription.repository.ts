@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationFrequency } from '../constants/enums/subscription';
 import { ISubscriptionRepository } from './interfaces/subscription-repoository.interface';
-import { ISubscription } from 'src/constants/types/subscription';
+import { ISubscription } from '../constants/types/subscription';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 
 @Injectable()

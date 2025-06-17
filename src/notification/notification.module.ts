@@ -1,16 +1,18 @@
 import { Module } from '@nestjs/common';
 import { NotificationService } from './notification.service';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { EmailService } from 'src/email/email.service';
-import { WeatherService } from 'src/weather/weather.service';
-import { FetchModule } from 'src/fetch/fetch.module';
-import { CacheModule } from 'src/cache/cache.module';
-import { CityModule } from 'src/city/city.module';
-import { EmailModule } from 'src/email/email.module';
+import { PrismaService } from '../prisma/prisma.service';
+import { EmailService } from '../email/email.service';
+import { WeatherService } from '../weather/weather.service';
+import { FetchModule } from '../fetch/fetch.module';
+import { CacheModule } from '../cache/cache.module';
+import { CityModule } from '../city/city.module';
+import { EmailModule } from '../email/email.module';
 import { NotificationRepository } from './notification.repository';
 import { NotificationRepositoryToken } from './interfaces/notification-repository.interface';
-import { WeatherClientModule } from 'src/weather-client/weather-client.module';
-import { SubscriptionModule } from 'src/subscription/subscription.module';
+import { WeatherClientModule } from '../weather-client/weather-client.module';
+import { SubscriptionModule } from '../subscription/subscription.module';
+import { SubscriptionRepository } from '../subscription/subscription.repository';
+import { SubscriptionRepositoryToken } from '../subscription/interfaces/subscription-repoository.interface';
 
 @Module({
   imports: [
@@ -27,6 +29,11 @@ import { SubscriptionModule } from 'src/subscription/subscription.module';
     EmailService,
     WeatherService,
     NotificationRepository,
+    SubscriptionRepository,
+    {
+      provide: SubscriptionRepositoryToken,
+      useExisting: SubscriptionRepository,
+    },
     {
       provide: NotificationRepositoryToken,
       useExisting: NotificationRepository,

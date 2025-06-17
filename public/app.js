@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const API_BASE_URL = 'http://localhost:3000/api';
+  const API_BASE_URL = window.API_BASE_URL || 'http://localhost:3000/api';
 
   const urlParams = new URLSearchParams(window.location.search);
   const pathSegments = window.location.pathname.split('/');

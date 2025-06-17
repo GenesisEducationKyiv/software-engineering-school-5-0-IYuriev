@@ -4,7 +4,7 @@ import { NotificationFrequency } from '../constants/enums/subscription';
 import {
   ISubscriptionRepository,
   SubscriptionRepositoryToken,
-} from 'src/subscription/interfaces/subscription-repoository.interface';
+} from '../subscription/interfaces/subscription-repoository.interface';
 import {
   INotificationRepository,
   NotificationRepositoryToken,

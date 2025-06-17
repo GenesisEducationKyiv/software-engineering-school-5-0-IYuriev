@@ -4,7 +4,7 @@ import { WeatherService } from '../weather/weather.service';
 import { ConfigService } from '@nestjs/config';
 import { formatWeatherMessage } from '../utils/notification/notification.format';
 
-import { ISubscription } from 'src/constants/types/subscription';
+import { ISubscription } from '../constants/types/subscription';
 import { INotificationRepository } from './interfaces/notification-repository.interface';
 
 @Injectable()

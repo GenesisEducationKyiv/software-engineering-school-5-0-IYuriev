@@ -5,7 +5,7 @@ import {
   IEmailTransport,
   EmailTransportToken,
 } from './interfaces/email-transport.interface';
-import { IEmailPayload } from 'src/constants/types/email.interface';
+import { IEmailPayload } from '../constants/types/email.interface';
 import { IEmailService } from './interfaces/email-service.interface';
 
 @Injectable()

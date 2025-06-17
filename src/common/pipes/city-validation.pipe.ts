@@ -1,6 +1,6 @@
 import { PipeTransform, Injectable } from '@nestjs/common';
 import { CityService } from '../../city/city.service';
-import { CreateSubscriptionDto } from 'src/subscription/dto/create-subscription.dto';
+import { CreateSubscriptionDto } from '../../subscription/dto/create-subscription.dto';
 
 @Injectable()
 export class CityValidationPipe implements PipeTransform {

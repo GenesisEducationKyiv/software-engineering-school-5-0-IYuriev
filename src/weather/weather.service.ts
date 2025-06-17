@@ -5,11 +5,11 @@ import { CacheKey } from '../constants/enums/cache';
 import {
   CacheServiceToken,
   ICacheService,
-} from 'src/cache/interfaces/cache-service.interface';
+} from '../cache/interfaces/cache-service.interface';
 import {
   IWeatherClientService,
   WeatherClientServiceToken,
-} from 'src/weather-client/interfaces/weather-service.interface';
+} from '../weather-client/interfaces/weather-service.interface';
 
 @Injectable()
 export class WeatherService implements IWeatherService {

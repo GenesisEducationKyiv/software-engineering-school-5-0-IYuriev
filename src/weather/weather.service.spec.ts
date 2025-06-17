@@ -1,43 +1,38 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WeatherService } from './weather.service';
-import { FetchService } from '../fetch/fetch.service';
-import { ConfigService } from '@nestjs/config';
-import { CacheService } from '../cache/cache.service';
-import { CityService } from '../city/city.service';
-import { IWeatherData } from '../constants/types/weather.interface';
+import { CacheServiceToken } from '../cache/interfaces/cache-service.interface';
+import { WeatherClientServiceToken } from '../weather-client/interfaces/weather-service.interface';
 
 describe('WeatherService', () => {
   let service: WeatherService;
+  let mockCacheService: { get: jest.Mock; set: jest.Mock };
+  let mockWeatherClientService: { fetchWeather: jest.Mock };
 
-  const mockFetchService = {
-    get: jest.fn(),
-  };
-
-  const mockConfigService = {
-    get: jest.fn((key: string) => {
-      if (key === 'API_KEY') return 'test-api-key';
-      if (key === 'WEATHER_API_URL') return 'https://api.weatherapi.com/v1/';
-      return '';
-    }),
-  };
-
-  const mockCacheService = {
-    get: jest.fn(),
-    set: jest.fn(),
-  };
-
-  const mockCityService = {
-    validateCity: jest.fn(),
+  const city = 'Kyiv';
+  const cacheKey = `weather:${city}`;
+  const weatherData = {
+    temperature: 22,
+    humidity: 60,
+    description: 'Sunny',
   };
 
   beforeEach(async () => {
+    mockCacheService = {
+      get: jest.fn(),
+      set: jest.fn(),
+    };
+    mockWeatherClientService = {
+      fetchWeather: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         WeatherService,
-        { provide: FetchService, useValue: mockFetchService },
-        { provide: ConfigService, useValue: mockConfigService },
-        { provide: CacheService, useValue: mockCacheService },
-        { provide: CityService, useValue: mockCityService },
+        { provide: CacheServiceToken, useValue: mockCacheService },
+        {
+          provide: WeatherClientServiceToken,
+          useValue: mockWeatherClientService,
+        },
       ],
     }).compile();
 
@@ -49,101 +44,50 @@ describe('WeatherService', () => {
   });
 
   describe('getWeather', () => {
-    const dto = { city: 'Kyiv' };
-    const validatedCity = 'Kyiv';
-    const cacheKey = `weather:${validatedCity}`;
+    it('should return weather from cache if available', async () => {
+      mockCacheService.get.mockResolvedValue(JSON.stringify(weatherData));
 
-    const mockApiResponse: IWeatherData = {
-      current: {
-        last_updated_epoch: 0,
-        last_updated: '',
-        temp_c: 18,
-        temp_f: 64.4,
-        is_day: 1,
-        condition: {
-          text: 'Sunny',
-          icon: '',
-          code: 1000,
-        },
-        wind_mph: 0,
-        wind_kph: 0,
-        wind_degree: 0,
-        wind_dir: '',
-        pressure_mb: 0,
-        pressure_in: 0,
-        precip_mm: 0,
-        precip_in: 0,
-        humidity: 55,
-        cloud: 0,
-        feelslike_c: 18,
-        feelslike_f: 64.4,
-        vis_km: 0,
-        vis_miles: 0,
-        uv: 0,
-        gust_mph: 0,
-        gust_kph: 0,
-        air_quality: {
-          co: 0,
-          no2: 0,
-          o3: 0,
-          so2: 0,
-          pm2_5: 0,
-          pm10: 0,
-          'us-epa-index': 0,
-          'gb-defra-index': 0,
-        },
-        windchill_c: 18,
-        windchill_f: 64.4,
-        heatindex_c: 18,
-        heatindex_f: 64.4,
-        dewpoint_c: 10,
-        dewpoint_f: 50,
-      },
-      location: {
-        name: 'Kyiv',
-        region: '',
-        country: '',
-        lat: 0,
-        lon: 0,
-        tz_id: '',
-        localtime_epoch: 0,
-        localtime: '',
-      },
-    };
-
-    const expectedResponse = {
-      temperature: 18,
-      humidity: 55,
-      description: 'Sunny',
-    };
-
-    it('should return cached weather data if available', async () => {
-      mockCityService.validateCity.mockResolvedValue(validatedCity);
-      mockCacheService.get.mockResolvedValue(JSON.stringify(expectedResponse));
-
-      const result = await service.getWeather(dto.city);
+      const result = await service.getWeather(city);
 
       expect(mockCacheService.get).toHaveBeenCalledWith(cacheKey);
-      expect(result).toEqual(expectedResponse);
-      expect(mockFetchService.get).not.toHaveBeenCalled();
+      expect(result).toEqual(weatherData);
+      expect(mockWeatherClientService.fetchWeather).not.toHaveBeenCalled();
     });
 
-    it('should fetch, cache, and return data if not cached', async () => {
-      mockCityService.validateCity.mockResolvedValue(validatedCity);
+    it('should fetch weather, cache it, and return if not in cache', async () => {
       mockCacheService.get.mockResolvedValue(null);
-      mockFetchService.get.mockResolvedValue(mockApiResponse);
+      mockWeatherClientService.fetchWeather.mockResolvedValue({
+        current: {
+          temp_c: weatherData.temperature,
+          humidity: weatherData.humidity,
+          condition: { text: weatherData.description },
+        },
+      });
 
-      const result = await service.getWeather(dto.city);
-
-      const expectedUrl = `https://api.weatherapi.com/v1/current.json?key=test-api-key&q=Kyiv&aqi=yes`;
+      const result = await service.getWeather(city);
 
       expect(mockCacheService.get).toHaveBeenCalledWith(cacheKey);
-      expect(mockFetchService.get).toHaveBeenCalledWith(expectedUrl);
+      expect(mockWeatherClientService.fetchWeather).toHaveBeenCalledWith(city);
       expect(mockCacheService.set).toHaveBeenCalledWith(
         cacheKey,
-        JSON.stringify(expectedResponse),
+        JSON.stringify(weatherData),
       );
-      expect(result).toEqual(expectedResponse);
+      expect(result).toEqual(weatherData);
+    });
+
+    it('should propagate errors from cache service', async () => {
+      mockCacheService.get.mockRejectedValue(new Error('Redis error'));
+
+      await expect(service.getWeather(city)).rejects.toThrow('Redis error');
+    });
+
+    it('should propagate errors from fetch service', async () => {
+      mockCacheService.get.mockResolvedValue(null);
+      mockWeatherClientService.fetchWeather.mockRejectedValue(
+        new Error('Fetch error'),
+      );
+
+      await expect(service.getWeather(city)).rejects.toThrow('Fetch error');
     });
   });
 });
