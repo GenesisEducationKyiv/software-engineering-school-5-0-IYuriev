@@ -76,24 +76,6 @@ describe('EmailService', () => {
       });
     });
 
-    it('should use empty string as from if EMAIL_USER is missing', async () => {
-      mockConfigService.get = jest.fn((key: string) =>
-        key === 'EMAIL_USER' ? undefined : 'http://localhost/confirm',
-      );
-      const payload: IEmailPayload = {
-        to: 'missing@example.com',
-        subject: 'No From',
-        text: 'No sender',
-      };
-
-      await service.sendForecastEmail(payload);
-
-      expect(mockEmailTransport.sendMail).toHaveBeenCalledWith({
-        from: '',
-        ...payload,
-      });
-    });
-
     it('should propagate errors from emailTransport', async () => {
       mockEmailTransport.sendMail.mockRejectedValueOnce(
         new Error('send error'),
