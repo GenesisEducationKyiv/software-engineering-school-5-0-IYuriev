@@ -1,0 +1,46 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { WeatherApiEndpoint } from '../constants/enums/weather';
+import { WeatherData, WeatherResponse } from '../constants/types/weather';
+import { CityResponse } from 'src/constants/types/city';
+import { HttpClient } from 'src/infrastructure/http/http.client';
+import { WeatherClient } from './interfaces/weather-service.interface';
+
+@Injectable()
+export class HttpWeatherClient implements WeatherClient {
+  private readonly API_KEY: string;
+  private readonly WEATHER_API_URL: string;
+
+  constructor(
+    private readonly httpClient: HttpClient,
+    private readonly config: ConfigService,
+  ) {
+    this.API_KEY = this.config.get<string>('API_KEY', '');
+    this.WEATHER_API_URL = this.config.get<string>('WEATHER_API_URL', '');
+  }
+
+  async getWeather(city: string): Promise<WeatherResponse> {
+    const data = await this.fetchWeather(city);
+    return {
+      temperature: data.current.temp_c,
+      humidity: data.current.humidity,
+      description: data.current.condition.text,
+    };
+  }
+
+  async validateCity(city: string): Promise<string> {
+    const cities = await this.searchCity(city);
+    if (!cities?.length) throw new NotFoundException('City not found');
+    return cities[0].name;
+  }
+
+  private async fetchWeather(city: string): Promise<WeatherData> {
+    const url = `${this.WEATHER_API_URL}${WeatherApiEndpoint.CURRENT}?key=${this.API_KEY}&q=${city}&aqi=yes`;
+    return this.httpClient.get<WeatherData>(url);
+  }
+
+  private async searchCity(city: string): Promise<CityResponse[]> {
+    const url = `${this.WEATHER_API_URL}${WeatherApiEndpoint.SEARCH}?key=${this.API_KEY}&q=${city}`;
+    return this.httpClient.get<CityResponse[]>(url);
+  }
+}

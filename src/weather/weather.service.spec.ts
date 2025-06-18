@@ -4,7 +4,7 @@ import { FetchService } from '../fetch/fetch.service';
 import { ConfigService } from '@nestjs/config';
 import { CacheService } from '../cache/cache.service';
 import { CityService } from '../city/city.service';
-import { IWeatherData } from '../constants/types/weather.interface';
+import { WeatherData } from '../constants/types/weather';
 
 describe('WeatherService', () => {
   let service: WeatherService;
@@ -53,7 +53,7 @@ describe('WeatherService', () => {
     const validatedCity = 'Kyiv';
     const cacheKey = `weather:${validatedCity}`;
 
-    const mockApiResponse: IWeatherData = {
+    const mockApiResponse: WeatherData = {
       current: {
         last_updated_epoch: 0,
         last_updated: '',

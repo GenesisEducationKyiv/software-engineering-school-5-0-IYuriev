@@ -1,17 +1,26 @@
 import { Module } from '@nestjs/common';
-import { WeatherClientService } from './weather-client.service';
-import { FetchModule } from 'src/fetch/fetch.module';
-import { WeatherClientServiceToken } from './interfaces/weather-service.interface';
+import { HttpWeatherClient } from './http-weather-client';
+import { HttpModule } from '../infrastructure/http/http.module';
+import { CacheModule } from '../cache/cache.module';
+import { CacheService } from '../cache/cache.service';
+import { WeatherClientToken } from './interfaces/weather-service.interface';
+import { CacheWeatherClientDecorator } from '../common/decorators/cache-weather-client.decorator';
 
 @Module({
-  imports: [FetchModule],
+  imports: [HttpModule, CacheModule],
   providers: [
-    WeatherClientService,
+    HttpWeatherClient,
     {
-      provide: WeatherClientServiceToken,
-      useExisting: WeatherClientService,
+      provide: WeatherClientToken,
+      useFactory: (
+        httpClient: HttpWeatherClient,
+        cacheService: CacheService,
+      ) => {
+        return new CacheWeatherClientDecorator(httpClient, cacheService);
+      },
+      inject: [HttpWeatherClient, CacheService],
     },
   ],
-  exports: [WeatherClientServiceToken],
+  exports: [WeatherClientToken],
 })
 export class WeatherClientModule {}

@@ -1,9 +1,8 @@
-import { ICityResponse } from 'src/constants/types/city.interface';
-import { IWeatherData } from 'src/constants/types/weather.interface';
+import { WeatherResponse } from '../../constants/types/weather';
 
-export interface IWeatherClientService {
-  fetchWeather(city: string): Promise<IWeatherData>;
-  searchCity(city: string): Promise<ICityResponse[]>;
+export interface WeatherClient {
+  getWeather(city: string): Promise<WeatherResponse>;
+  validateCity?(city: string): Promise<string>;
 }
 
-export const WeatherClientServiceToken = Symbol('WeatherClientService');
+export const WeatherClientToken = Symbol('WeatherClient');
