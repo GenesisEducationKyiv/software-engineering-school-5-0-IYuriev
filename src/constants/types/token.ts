@@ -1,4 +1,4 @@
-export interface IToken {
+export type Token = {
   token: string;
   subscriptionId: number;
-}
+};

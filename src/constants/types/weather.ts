@@ -1,4 +1,4 @@
-export interface IWeatherData {
+export type WeatherData = {
   location: {
     name: string;
     region: string;
@@ -54,10 +54,10 @@ export interface IWeatherData {
       'gb-defra-index': number;
     };
   };
-}
+};
 
-export interface IWeatherResponse {
+export type WeatherResponse = {
   temperature: number;
   humidity: number;
   description: string;
-}
+};
