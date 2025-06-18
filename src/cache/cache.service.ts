@@ -1,11 +1,15 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { CacheTTL } from '../constants/enums/cache';
 import Redis from 'ioredis';
-import { ICacheService } from 'src/cache/interfaces/cache-service.interface';
-import { CacheTTL } from 'src/constants/enums/cache';
+
+export abstract class CacheService {
+  abstract set(key: string, value: string, ttl?: number): Promise<void>;
+  abstract get(key: string): Promise<string | null>;
+}
 
 @Injectable()
-export class RedisCacheService implements OnModuleDestroy, ICacheService {
+export class RedisCacheService implements OnModuleDestroy, CacheService {
   private readonly client: Redis;
 
   constructor(private readonly config: ConfigService) {
