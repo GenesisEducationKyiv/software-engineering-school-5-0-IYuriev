@@ -1,50 +1,44 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import {
-  ISubscriptionRepository,
+  SubscriptionRepo,
   SubscriptionRepositoryToken,
 } from './interfaces/subscription-repoository.interface';
 import {
   EmailServiceToken,
-  IEmailService,
-} from 'src/email/interfaces/email-service.interface';
+  EmailProvider,
+} from '../email/interfaces/email-service.interface';
 import {
-  ITokenService,
+  TokenProvider,
   TokenServiceToken,
-} from 'src/token/interfaces/token-service.interface';
-import { ISubscriptionService } from './interfaces/subscription-service.interface';
+} from '../token/interfaces/token-service.interface';
+import { SubscriptionProvider } from './interfaces/subscription-service.interface';
 
 @Injectable()
-export class SubscriptionService implements ISubscriptionService {
+export class SubscriptionService implements SubscriptionProvider {
   constructor(
     @Inject(SubscriptionRepositoryToken)
-    private readonly subscriptionRepo: ISubscriptionRepository,
-    @Inject(EmailServiceToken) private readonly emailService: IEmailService,
-    @Inject(TokenServiceToken) private readonly tokenService: ITokenService,
+    private readonly subscriptionRepo: SubscriptionRepo,
+    @Inject(EmailServiceToken) private readonly emailService: EmailProvider,
+    @Inject(TokenServiceToken) private readonly tokenService: TokenProvider,
   ) {}
 
-  async subscribe(dto: CreateSubscriptionDto): Promise<{ message: string }> {
+  async subscribe(dto: CreateSubscriptionDto): Promise<void> {
     const existing = await this.subscriptionRepo.findSubscription(dto);
     if (existing) throw new ConflictException('Email already subscribed');
 
     const subscription = await this.subscriptionRepo.create(dto);
     const token = await this.tokenService.createConfirmToken(subscription.id);
     await this.emailService.sendConfirmationEmail(dto.email, token);
-
-    return { message: 'Subscription successful. Confirmation email sent.' };
   }
 
-  async confirm(token: string): Promise<{ message: string }> {
+  async confirm(token: string): Promise<void> {
     const dbToken = await this.tokenService.getValidToken(token);
     await this.subscriptionRepo.confirm(dbToken.subscriptionId);
-
-    return { message: 'Subscription confirmed successfully' };
   }
 
-  async unsubscribe(token: string): Promise<{ message: string }> {
+  async unsubscribe(token: string): Promise<void> {
     const dbToken = await this.tokenService.getValidToken(token);
     await this.subscriptionRepo.delete(dbToken.subscriptionId);
-
-    return { message: 'Unsubscribed successfully' };
   }
 }

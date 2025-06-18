@@ -1,7 +1,7 @@
-import { IToken } from 'src/constants/types/token.interface';
+import { Token } from '../../constants/types/token';
 
-export interface ITokenService {
+export interface TokenProvider {
   createConfirmToken(subscriptionId: number): Promise<string>;
-  getValidToken(token: string): Promise<IToken>;
+  getValidToken(token: string): Promise<Token>;
 }
 export const TokenServiceToken = Symbol('TokenService');

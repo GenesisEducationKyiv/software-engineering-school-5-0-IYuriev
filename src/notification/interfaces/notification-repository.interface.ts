@@ -1,7 +1,7 @@
-import { ISubscription } from 'src/constants/types/subscription';
+import { Subscription } from '../../constants/types/subscription';
 
-export interface INotificationRepository {
-  send(sub: ISubscription): Promise<void>;
+export interface NotificationRepo {
+  send(sub: Subscription): Promise<void>;
 }
 
 export const NotificationRepositoryToken = Symbol(

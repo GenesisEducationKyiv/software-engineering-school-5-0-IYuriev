@@ -4,11 +4,11 @@ import { WeatherService } from '../weather/weather.service';
 import { ConfigService } from '@nestjs/config';
 import { formatWeatherMessage } from '../utils/notification/notification.format';
 
-import { ISubscription } from 'src/constants/types/subscription';
-import { INotificationRepository } from './interfaces/notification-repository.interface';
+import { Subscription } from 'src/constants/types/subscription';
+import { NotificationRepo } from './interfaces/notification-repository.interface';
 
 @Injectable()
-export class NotificationRepository implements INotificationRepository {
+export class NotificationRepository implements NotificationRepo {
   private readonly unsubscribeUrl = this.config.get<string>('UNSUBSCRIBE_URL');
 
   constructor(
@@ -17,7 +17,7 @@ export class NotificationRepository implements INotificationRepository {
     private readonly config: ConfigService,
   ) {}
 
-  async send(sub: ISubscription): Promise<void> {
+  async send(sub: Subscription): Promise<void> {
     const weather = await this.weatherService.getWeather(sub.city);
     const link = `${this.unsubscribeUrl}/${sub.token}`;
     const message = formatWeatherMessage(sub.city, weather, link);

@@ -1,4 +1,4 @@
-export interface IEmailTransport {
+export interface EmailTransport {
   sendMail(options: {
     from: string;
     to: string;

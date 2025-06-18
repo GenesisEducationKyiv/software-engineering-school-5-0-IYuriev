@@ -2,22 +2,22 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { NotificationFrequency } from '../constants/enums/subscription';
 import {
-  ISubscriptionRepository,
+  SubscriptionRepo,
   SubscriptionRepositoryToken,
-} from 'src/subscription/interfaces/subscription-repoository.interface';
+} from '../subscription/interfaces/subscription-repoository.interface';
 import {
-  INotificationRepository,
+  NotificationRepo,
   NotificationRepositoryToken,
 } from './interfaces/notification-repository.interface';
-import { INotificationService } from './interfaces/notification-service.interface';
+import { NotificationProvider } from './interfaces/notification-service.interface';
 
 @Injectable()
-export class NotificationService implements INotificationService {
+export class NotificationService implements NotificationProvider {
   constructor(
     @Inject(SubscriptionRepositoryToken)
-    private readonly subscriptionRepo: ISubscriptionRepository,
+    private readonly subscriptionRepo: SubscriptionRepo,
     @Inject(NotificationRepositoryToken)
-    private readonly notificationRepo: INotificationRepository,
+    private readonly notificationRepo: NotificationRepo,
   ) {}
 
   @Cron(CronExpression.EVERY_HOUR)

@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
-import { Email } from 'src/constants/enums/email';
-import { IEmailTransport } from 'src/email/interfaces/email-transport.interface';
+import { Email } from '../constants/enums/email';
+import { EmailTransport } from '../email/interfaces/email-transport.interface';
 
 @Injectable()
-export class NodemailerService implements IEmailTransport {
+export class NodemailerService implements EmailTransport {
   private transporter: nodemailer.Transporter;
 
   constructor(private readonly config: ConfigService) {

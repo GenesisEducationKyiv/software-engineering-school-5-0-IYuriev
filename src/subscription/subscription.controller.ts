@@ -9,16 +9,20 @@ export class SubscriptionController {
 
   @UsePipes(CityValidationPipe)
   @Post('/subscribe')
-  subscribe(@Body() dto: CreateSubscriptionDto) {
-    return this.subscriptionService.subscribe(dto);
+  async subscribe(@Body() dto: CreateSubscriptionDto) {
+    await this.subscriptionService.subscribe(dto);
+    return { message: 'Subscription successful. Confirmation email sent.' };
   }
+
   @Get('confirm/:token')
   async confirm(@Param('token') token: string) {
-    return await this.subscriptionService.confirm(token);
+    await this.subscriptionService.confirm(token);
+    return { message: 'Subscription confirmed successfully' };
   }
 
   @Get('unsubscribe/:token')
   async unsubscribe(@Param('token') token: string) {
-    return await this.subscriptionService.unsubscribe(token);
+    await this.subscriptionService.unsubscribe(token);
+    return { message: 'Unsubscribed successfully' };
   }
 }

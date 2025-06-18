@@ -1,8 +1,8 @@
-import { IEmailPayload } from 'src/constants/types/email.interface';
+import { EmailPayload } from '../../constants/types/email';
 
-export interface IEmailService {
+export interface EmailProvider {
   sendConfirmationEmail(email: string, token: string): Promise<void>;
-  sendForecastEmail(payload: IEmailPayload): Promise<void>;
+  sendForecastEmail(payload: EmailPayload): Promise<void>;
 }
 
 export const EmailServiceToken = Symbol('EmailService');
