@@ -1,4 +1,4 @@
-export interface ICityResponse {
+export type CityResponse = {
   id: number;
   name: string;
   region: string;
@@ -6,4 +6,4 @@ export interface ICityResponse {
   lat: number;
   lon: number;
   url: string;
-}
+};

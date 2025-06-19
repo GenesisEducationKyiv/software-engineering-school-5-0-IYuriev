@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { WeatherService } from './weather.service';
 import { WeatherController } from './weather.controller';
-import { FetchService } from 'src/fetch/fetch.service';
-import { CacheService } from 'src/cache/cache.service';
-import { CityService } from 'src/city/city.service';
+import { CacheModule } from 'src/cache/cache.module';
+import { WeatherClientModule } from 'src/weather-client/weather-client.module';
 
 @Module({
+  imports: [CacheModule, WeatherClientModule],
   controllers: [WeatherController],
-  providers: [WeatherService, FetchService, CacheService, CityService],
+  providers: [WeatherService],
 })
 export class WeatherModule {}

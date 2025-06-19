@@ -60,7 +60,7 @@ describe('EmailService', () => {
       const token = 'some-token';
       const expectedLink = `https://confirm.url/${token}`;
 
-      await service.sendEmail(email, token);
+      await service.sendConfirmationEmail(email, token);
 
       expect(sendMailMock).toHaveBeenCalledWith({
         from: 'test@example.com',

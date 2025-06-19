@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { WinstonLogger } from './logger/logger.service';
 import { ValidationPipe } from '@nestjs/common';
+import { WinstonLogger } from './infrastructure/logger/logger.service';
 import 'dotenv/config';
 
 async function bootstrap() {

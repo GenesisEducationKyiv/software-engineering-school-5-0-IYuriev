@@ -1,5 +1,5 @@
 import { Injectable, LoggerService } from '@nestjs/common';
-import { getWinstonFormat } from '../utils/logger/logger.format';
+import { getWinstonFormat } from '../../utils/logger/logger.format';
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
 

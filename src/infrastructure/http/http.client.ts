@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { WinstonLogger } from '../logger/logger.service';
 
 @Injectable()
-export class FetchService {
+export class HttpClient {
   constructor(private readonly logger: WinstonLogger) {}
 
   async get<T = unknown>(url: string): Promise<T> {
