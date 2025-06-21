@@ -9,7 +9,7 @@ import {
 import { WeatherProvider } from 'src/weather-client/weather-client.provider';
 
 @Injectable()
-export class CacheWeatherClientDecorator implements WeatherClient {
+export class CacheWeatherClientProxy implements WeatherClient {
   constructor(
     private readonly provider: WeatherProvider & CityValidatable,
     private readonly cacheService: CacheService,

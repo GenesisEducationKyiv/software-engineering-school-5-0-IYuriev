@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CacheService } from '../cache/cache.service';
-import { CacheWeatherClientDecorator } from '../common/decorators/cache-weather-client.decorator';
+import { CacheWeatherClientProxy } from '../common/proxies/cache-weather-client.proxy';
 import { WeatherClient } from './interfaces/weather-service.interface';
 import { HttpWeatherClient } from '../weather-client/http-weather-client';
 import { OpenWeatherClient } from '../weather-client/openweather-client';
@@ -29,6 +29,6 @@ export class WeatherFactory {
     );
     loggedWeatherAPI.setNext(loggedOpenWeather);
 
-    return new CacheWeatherClientDecorator(loggedWeatherAPI, this.cache);
+    return new CacheWeatherClientProxy(loggedWeatherAPI, this.cache);
   }
 }
