@@ -3,7 +3,7 @@ import { WeatherResponse } from '../constants/types/weather';
 import {
   WeatherClient,
   WeatherClientToken,
-} from '../weather-client/interfaces/weather-service.interface';
+} from './interfaces/weather-service.interface';
 
 @Injectable()
 export class WeatherService implements WeatherClient {

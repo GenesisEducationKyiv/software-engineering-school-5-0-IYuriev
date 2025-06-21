@@ -7,16 +7,16 @@ import { CacheModule } from 'src/cache/cache.module';
 import { EmailModule } from 'src/email/email.module';
 import { NotificationRepository } from './notification.repository';
 import { NotificationRepositoryToken } from './interfaces/notification-repository.interface';
-import { WeatherClientModule } from 'src/weather-client/weather-client.module';
 import { SubscriptionModule } from 'src/subscription/subscription.module';
 import { HttpModule } from 'src/infrastructure/http/http.module';
+import { WeatherModule } from 'src/weather/weather.module';
 
 @Module({
   imports: [
     HttpModule,
     CacheModule,
     EmailModule,
-    WeatherClientModule,
+    WeatherModule,
     SubscriptionModule,
   ],
   providers: [

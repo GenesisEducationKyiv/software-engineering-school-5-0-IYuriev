@@ -6,10 +6,10 @@ import { EmailModule } from 'src/email/email.module';
 import { SubscriptionRepository } from './subscription.repository';
 import { SubscriptionRepositoryToken } from './interfaces/subscription-repoository.interface';
 import { TokenModule } from 'src/token/token.module';
-import { WeatherClientModule } from '../weather-client/weather-client.module';
+import { WeatherModule } from 'src/weather/weather.module';
 
 @Module({
-  imports: [EmailModule, TokenModule, WeatherClientModule],
+  imports: [EmailModule, TokenModule, WeatherModule],
   controllers: [SubscriptionController],
   providers: [
     SubscriptionService,
