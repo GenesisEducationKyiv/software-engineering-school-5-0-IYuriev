@@ -4,6 +4,8 @@ import { CacheWeatherClientDecorator } from '../common/decorators/cache-weather-
 import { WeatherClient } from './interfaces/weather-service.interface';
 import { HttpWeatherClient } from '../weather-client/http-weather-client';
 import { OpenWeatherClient } from '../weather-client/openweather-client';
+import { WinstonLogger } from '../infrastructure/logger/logger.service';
+import { LogWeatherClientDecorator } from '../common/decorators/log-weather-client.decorator';
 
 @Injectable()
 export class WeatherFactory {
@@ -11,10 +13,22 @@ export class WeatherFactory {
     private readonly weatherAPI: HttpWeatherClient,
     private readonly openWeather: OpenWeatherClient,
     private readonly cache: CacheService,
+    private readonly logger: WinstonLogger,
   ) {}
 
   create(): WeatherClient {
-    this.weatherAPI.setNext(this.openWeather);
-    return new CacheWeatherClientDecorator(this.weatherAPI, this.cache);
+    const loggedWeatherAPI = new LogWeatherClientDecorator(
+      this.weatherAPI,
+      this.logger,
+      'weatherapi.com',
+    );
+    const loggedOpenWeather = new LogWeatherClientDecorator(
+      this.openWeather,
+      this.logger,
+      'openweathermap.org',
+    );
+    loggedWeatherAPI.setNext(loggedOpenWeather);
+
+    return new CacheWeatherClientDecorator(loggedWeatherAPI, this.cache);
   }
 }

@@ -5,9 +5,10 @@ import { CacheModule } from 'src/cache/cache.module';
 import { WeatherClientModule } from 'src/weather-client/weather-client.module';
 import { WeatherClientToken } from 'src/weather/interfaces/weather-service.interface';
 import { WeatherFactory } from './weather-factory';
+import { LoggerModule } from '../infrastructure/logger/logger.module';
 
 @Module({
-  imports: [CacheModule, WeatherClientModule],
+  imports: [CacheModule, WeatherClientModule, LoggerModule],
   controllers: [WeatherController],
   providers: [
     WeatherService,
