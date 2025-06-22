@@ -8,7 +8,6 @@ import * as request from 'supertest';
 describe('Subscription API (Integration)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  let token: string;
 
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
@@ -23,27 +22,26 @@ describe('Subscription API (Integration)', () => {
     prisma = app.get(PrismaService);
     await prisma.token.deleteMany();
     await prisma.subscription.deleteMany();
-
-    const email = 'test@example.com';
-    const city = 'Kyiv';
-    const frequency = 'daily';
-
-    await request(app.getHttpServer())
-      .post('/api/subscribe')
-      .send({ email, city, frequency });
-
-    const sub = await prisma.subscription.findFirst({ where: { email } });
-    const dbToken = await prisma.token.findFirst({
-      where: { subscriptionId: sub?.id },
-    });
-    token = dbToken?.token || '';
   });
 
   afterAll(async () => {
     await app.close();
   });
 
+  async function createSubscriptionAndGetToken(email: string) {
+    await request(app.getHttpServer())
+      .post('/api/subscribe')
+      .send({ email, city: 'Kyiv', frequency: 'daily' });
+
+    const sub = await prisma.subscription.findFirst({ where: { email } });
+    const dbToken = await prisma.token.findFirst({
+      where: { subscriptionId: sub?.id },
+    });
+    return dbToken?.token || '';
+  }
+
   it('should confirm subscription with valid token', async () => {
+    const token = await createSubscriptionAndGetToken('confirm@example.com');
     const res = await request(app.getHttpServer())
       .get(`/api/confirm/${token}`)
       .expect(200);
@@ -52,6 +50,9 @@ describe('Subscription API (Integration)', () => {
   });
 
   it('should unsubscribe with valid token', async () => {
+    const token = await createSubscriptionAndGetToken(
+      'unsubscribe@example.com',
+    );
     const res = await request(app.getHttpServer())
       .get(`/api/unsubscribe/${token}`)
       .expect(200);
