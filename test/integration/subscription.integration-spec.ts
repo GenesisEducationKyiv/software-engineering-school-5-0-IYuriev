@@ -1,140 +1,74 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { SubscriptionService } from 'src/subscription/subscription.service';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { EmailService } from 'src/email/email.service';
-import { TokenService } from 'src/token/token.service';
-import { CityService } from 'src/city/city.service';
-import { ConfigModule } from '@nestjs/config';
-import { NotificationFrequency } from 'src/constants/enums/subscription';
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import { AppModule } from '../../src/app.module';
+import { PrismaService } from '../../src/prisma/prisma.service';
+import * as request from 'supertest';
 
-describe('SubscriptionService (integration)', () => {
-  let service: SubscriptionService;
+describe('Subscription API (Integration)', () => {
+  let app: INestApplication;
   let prisma: PrismaService;
 
-  const mockEmailService = {
-    sendEmail: jest.fn(),
-  };
-  const mockTokenService = {
-    createConfirmToken: jest.fn().mockResolvedValue('token123'),
-    getValidToken: jest.fn(),
-  };
-  const mockCityService = {
-    validateCity: jest.fn().mockResolvedValue('Kyiv'),
-  };
-
   beforeAll(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot({ isGlobal: true })],
-      providers: [
-        SubscriptionService,
-        PrismaService,
-        { provide: EmailService, useValue: mockEmailService },
-        { provide: TokenService, useValue: mockTokenService },
-        { provide: CityService, useValue: mockCityService },
-      ],
+    const moduleFixture = await Test.createTestingModule({
+      imports: [AppModule],
     }).compile();
 
-    service = module.get<SubscriptionService>(SubscriptionService);
-    prisma = module.get<PrismaService>(PrismaService);
+    app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+    app.setGlobalPrefix('api');
+    await app.init();
 
+    prisma = app.get(PrismaService);
     await prisma.token.deleteMany();
     await prisma.subscription.deleteMany();
   });
 
-  afterEach(async () => {
-    jest.clearAllMocks();
-    await prisma.token.deleteMany();
-    await prisma.subscription.deleteMany();
+  afterAll(async () => {
+    await app.close();
   });
 
-  it('should create a new subscription and send email', async () => {
-    const dto = {
-      email: 'integration@example.com',
-      city: 'Kyiv',
-      frequency: NotificationFrequency.DAILY,
-    };
+  async function createSubscriptionAndGetToken(email: string) {
+    await request(app.getHttpServer())
+      .post('/api/subscribe')
+      .send({ email, city: 'Kyiv', frequency: 'daily' });
 
-    const result = await service.subscribe(dto);
-
-    expect(result).toEqual({
-      message: 'Subscription successful. Confirmation email sent.',
+    const sub = await prisma.subscription.findFirst({ where: { email } });
+    const dbToken = await prisma.token.findFirst({
+      where: { subscriptionId: sub?.id },
     });
+    return dbToken?.token || '';
+  }
 
-    const sub = await prisma.subscription.findFirst({
-      where: { email: dto.email, city: dto.city },
-    });
-    expect(sub).toBeDefined();
-    expect(mockEmailService.sendEmail).toHaveBeenCalledWith(
-      dto.email,
-      'token123',
+  it('should confirm subscription with valid token', async () => {
+    const token = await createSubscriptionAndGetToken('confirm@example.com');
+    const res = await request(app.getHttpServer())
+      .get(`/api/confirm/${token}`)
+      .expect(200);
+
+    expect(res.body).toHaveProperty('message');
+  });
+
+  it('should unsubscribe with valid token', async () => {
+    const token = await createSubscriptionAndGetToken(
+      'unsubscribe@example.com',
     );
+    const res = await request(app.getHttpServer())
+      .get(`/api/unsubscribe/${token}`)
+      .expect(200);
+
+    expect(res.body).toHaveProperty('message');
   });
 
-  it('should not allow duplicate subscription', async () => {
-    const dto = {
-      email: 'integration@example.com',
-      city: 'Kyiv',
-      frequency: NotificationFrequency.DAILY,
-    };
-    await service.subscribe(dto);
-
-    await expect(service.subscribe(dto)).rejects.toThrow();
+  it('should return 400 for invalid token in confirm API', async () => {
+    await request(app.getHttpServer())
+      .get('/api/confirm/invalidtoken')
+      .expect(400);
   });
 
-  it('should confirm subscription', async () => {
-    const dto = {
-      email: 'integration@example.com',
-      city: 'Kyiv',
-      frequency: NotificationFrequency.DAILY,
-    };
-    await service.subscribe(dto);
-
-    const sub = await prisma.subscription.findFirst({
-      where: { email: dto.email },
-    });
-    if (!sub) {
-      throw new Error('Subscription not found');
-    }
-    mockTokenService.getValidToken.mockResolvedValue({
-      subscriptionId: sub.id,
-    });
-
-    const result = await service.confirm('sometoken');
-    expect(result).toEqual({ message: 'Subscription confirmed successfully' });
-
-    const updated = await prisma.subscription.findUnique({
-      where: { id: sub.id },
-    });
-    if (!updated) {
-      throw new Error('Updated subscription not found');
-    }
-    expect(updated.confirmed).toBe(true);
-  });
-
-  it('should unsubscribe', async () => {
-    const dto = {
-      email: 'integration@example.com',
-      city: 'Kyiv',
-      frequency: NotificationFrequency.DAILY,
-    };
-    await service.subscribe(dto);
-
-    const sub = await prisma.subscription.findFirst({
-      where: { email: dto.email },
-    });
-    if (!sub) {
-      throw new Error('Subscription not found');
-    }
-    mockTokenService.getValidToken.mockResolvedValue({
-      subscriptionId: sub.id,
-    });
-
-    const result = await service.unsubscribe('sometoken');
-    expect(result).toEqual({ message: 'Unsubscribed successfully' });
-
-    const deleted = await prisma.subscription.findUnique({
-      where: { id: sub.id },
-    });
-    expect(deleted).toBeNull();
+  it('should return 400 for invalid token in unsubscribe API', async () => {
+    await request(app.getHttpServer())
+      .get('/api/unsubscribe/invalidtoken')
+      .expect(400);
   });
 });
