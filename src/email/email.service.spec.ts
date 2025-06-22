@@ -8,29 +8,23 @@ import { IEmailPayload } from 'src/constants/types/email.interface';
 describe('EmailService', () => {
   let service: EmailService;
   let mockEmailTransport: { sendMail: jest.Mock };
-  let mockConfigService: { get: jest.Mock };
+  let config: ConfigService;
 
   beforeEach(async () => {
     mockEmailTransport = {
       sendMail: jest.fn().mockResolvedValue(undefined),
-    };
-    mockConfigService = {
-      get: jest.fn((key: string) => {
-        if (key === 'CONFIRMATION_URL') return 'http://localhost/confirm';
-        if (key === 'EMAIL_USER') return 'sender@example.com';
-        return undefined;
-      }),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         EmailService,
         { provide: EmailTransportToken, useValue: mockEmailTransport },
-        { provide: ConfigService, useValue: mockConfigService },
+        ConfigService,
       ],
     }).compile();
 
     service = module.get<EmailService>(EmailService);
+    config = module.get<ConfigService>(ConfigService);
   });
 
   afterEach(() => {
@@ -45,10 +39,10 @@ describe('EmailService', () => {
       await service.sendConfirmationEmail(email, token);
 
       expect(mockEmailTransport.sendMail).toHaveBeenCalledWith({
-        from: 'sender@example.com',
+        from: config.get<string>('EMAIL_USER'),
         to: email,
         subject: Email.SUBJECT,
-        text: `${Email.TEXT}http://localhost/confirm/${token}`,
+        text: `${Email.TEXT}${config.get<string>('CONFIRMATION_URL')}/${token}`,
       });
     });
 
@@ -71,7 +65,7 @@ describe('EmailService', () => {
       await service.sendForecastEmail(payload);
 
       expect(mockEmailTransport.sendMail).toHaveBeenCalledWith({
-        from: 'sender@example.com',
+        from: config.get<string>('EMAIL_USER'),
         ...payload,
       });
     });
