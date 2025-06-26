@@ -11,7 +11,7 @@ import {
 import { WeatherProvider } from './weather-client.provider';
 
 @Injectable()
-export class HttpWeatherClient
+export class WeatherApiClient
   extends WeatherProvider
   implements WeatherClient, CityValidatable
 {
