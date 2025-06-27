@@ -1,0 +1,25 @@
+name: E2E Test Pipeline
+
+on:
+  push:
+
+jobs:
+  e2e-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create .env.test file
+        run: echo "${{ secrets.TEST_ENV_FILE }}" > .env.test
+
+      - name: Build node-server image
+        run: docker compose -f docker-compose.test.yml build node-server
+
+      - name: Run E2E tests via Docker Compose
+        run: docker compose -f docker-compose.test.yml up --build --abort-on-container-exit node-e2e-test
+
+      - name: Clean up Docker Compose
+        if: always()
+        run: docker compose -f docker-compose.test.yml down -v

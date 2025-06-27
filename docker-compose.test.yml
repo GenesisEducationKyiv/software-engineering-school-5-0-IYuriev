@@ -1,15 +1,39 @@
-version: '3.8'
-
 volumes:
   postgres-db-test:
   redis-data-test:
 
 services:
-  node-test:
-    container_name: node-test
+  node-unit-test:
+    container_name: node-unit-test
     build:
-      context: .
       dockerfile: Dockerfile.test
+    env_file:
+      - .env.test
+    depends_on:
+      - db-test
+      - redis-test
+    volumes:
+      - ./test:/home/node/app/test
+    command: npm run test
+
+  node-integration-test:
+    container_name: node-integration-test
+    build:
+      dockerfile: Dockerfile.test
+    env_file:
+      - .env.test
+    depends_on:
+      - db-test
+      - redis-test
+    volumes:
+      - ./test:/home/node/app/test
+      - ./jest.integration.config.js:/home/node/app/jest.integration.config.js
+    command: sh -c "npx prisma migrate deploy --schema ./prisma/schema.prisma && npm run test:integration"
+
+  node-e2e-test:
+    container_name: node-e2e-test
+    build:
+      dockerfile: Dockerfile.playwright
     env_file:
       - .env.test
     depends_on:
@@ -17,10 +41,13 @@ services:
         condition: service_healthy
       redis-test:
         condition: service_started
+      node-server:
+        condition: service_started
+      frontend:
+        condition: service_healthy
     volumes:
-      - ./src:/home/node/app/src
       - ./test:/home/node/app/test
-    command: sh -c "npx prisma migrate deploy --schema ./prisma/schema.prisma && npm run test && npm run test:e2e && npm run test:integration"
+    command: sh -c "npx prisma migrate deploy --schema ./prisma/schema.prisma && npm run test:e2e"
 
   db-test:
     container_name: db-test
@@ -30,18 +57,16 @@ services:
     env_file:
       - .env.test
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - postgres-db-test:/var/lib/postgresql/data
     ports:
-      - 5544:5432
+      - 5434:5432
     user: postgres
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -d postgres']
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 5
 
   redis-test:
@@ -52,3 +77,38 @@ services:
       - 6381:6379
     volumes:
       - redis-data-test:/data
+
+  node-server:
+    container_name: node-server
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    env_file:
+      - .env.test
+    ports:
+      - 3000:3000
+    depends_on:
+      db-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_started
+    volumes:
+      - ./src:/home/node/app/src
+    command: sh -c "npx prisma migrate deploy --schema ./prisma/schema.prisma && npm run start:dev"
+
+  frontend:
+    container_name: frontend
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./public:/app/public
+    command: sh -c "npm install -g serve && serve -s public -l 8080"
+    ports:
+      - 8080:8080
+    depends_on:
+      - node-server
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:8080']
+      interval: 3s
+      timeout: 2s
+      retries: 10
