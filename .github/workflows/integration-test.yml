@@ -14,6 +14,9 @@ jobs:
       - name: Create .env.test file
         run: echo "${{ secrets.TEST_ENV_FILE }}" > .env.test
 
+      - name: Build node-server image
+        run: docker compose -f docker-compose.test.yml build node-server
+
       - name: Run integration tests via Docker Compose
         run: docker compose -f docker-compose.test.yml up --build --abort-on-container-exit node-integration-test
 
