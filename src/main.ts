@@ -16,6 +16,7 @@ async function bootstrap() {
       'http://127.0.0.1:5500',
       'http://localhost:3000',
       'https://weather-subscription-service.vercel.app',
+      'http://frontend:8080',
     ],
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',

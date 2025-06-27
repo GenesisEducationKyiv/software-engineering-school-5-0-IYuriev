@@ -18,7 +18,17 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "src/*": ["src/*"]
+    }
   },
-  "include": ["src/**/*", "public/**/*.js", "test", "test/**/*.ts"]
+  "include": [
+    "src/**/*",
+    "public/**/*.js",
+    "test",
+    "test/**/*.ts",
+    "playwright.config.ts",
+    "jest.integration.config.js"
+  ]
 }
