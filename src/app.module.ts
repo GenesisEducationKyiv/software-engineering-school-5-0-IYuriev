@@ -15,6 +15,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from './cache/cache.module';
 import { WeatherClientModule } from './weather-client/weather-client.module';
 import { LoggerModule } from './infrastructure/logger/logger.module';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { LoggerModule } from './infrastructure/logger/logger.module';
     NotificationModule,
     CacheModule,
     WeatherClientModule,
+    PrometheusModule.register(),
   ],
 })
 export class AppModule implements NestModule {
