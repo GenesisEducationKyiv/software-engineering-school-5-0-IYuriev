@@ -31,7 +31,11 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
     NotificationModule,
     CacheModule,
     WeatherClientModule,
-    PrometheusModule.register(),
+    PrometheusModule.register({
+      defaultMetrics: {
+        enabled: false,
+      },
+    }),
   ],
 })
 export class AppModule implements NestModule {
