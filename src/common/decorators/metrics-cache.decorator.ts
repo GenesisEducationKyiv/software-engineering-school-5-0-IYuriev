@@ -1,6 +1,6 @@
-import { CacheService } from 'src/cache/cache.service';
 import { CacheTTL } from 'src/constants/enums/cache';
-import { MetricsService } from 'src/metrics/metrics.service';
+import { CacheService } from 'src/core/cache/cache.abstract';
+import { MetricsService } from 'src/infrastructure/metrics/metrics.service';
 
 export class MetricsCacheDecorator implements CacheService {
   constructor(

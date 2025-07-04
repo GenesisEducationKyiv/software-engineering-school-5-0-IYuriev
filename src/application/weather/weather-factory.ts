@@ -1,0 +1,34 @@
+import { Injectable } from '@nestjs/common';
+import { CacheWeatherClientProxy } from '../../common/proxies/cache-weather-client.proxy';
+import { WeatherClient } from '../../core/weather/weather.interface';
+import { WeatherApiClient } from '../../infrastructure/weather/weather-api-client';
+import { WinstonLogger } from '../../infrastructure/logger/logger.service';
+import { LogWeatherClientDecorator } from '../../common/decorators/log-weather-client.decorator';
+import { CacheService } from '../../core/cache/cache.abstract';
+import { OpenWeatherClient } from 'src/infrastructure/weather/open-weather-client';
+
+@Injectable()
+export class WeatherFactory {
+  constructor(
+    private readonly weatherAPI: WeatherApiClient,
+    private readonly openWeather: OpenWeatherClient,
+    private readonly cache: CacheService,
+    private readonly logger: WinstonLogger,
+  ) {}
+
+  create(): WeatherClient {
+    const loggedWeatherAPI = new LogWeatherClientDecorator(
+      this.weatherAPI,
+      this.logger,
+      'weatherapi.com',
+    );
+    const loggedOpenWeather = new LogWeatherClientDecorator(
+      this.openWeather,
+      this.logger,
+      'openweathermap.org',
+    );
+    loggedWeatherAPI.setNext(loggedOpenWeather);
+
+    return new CacheWeatherClientProxy(loggedWeatherAPI, this.cache);
+  }
+}

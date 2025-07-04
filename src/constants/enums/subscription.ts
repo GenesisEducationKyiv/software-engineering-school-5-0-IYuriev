@@ -1,4 +1,4 @@
-export enum NotificationFrequency {
+export enum Frequency {
   HOURLY = 'hourly',
   DAILY = 'daily',
 }
