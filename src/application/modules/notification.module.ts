@@ -8,7 +8,7 @@ import { WeatherModule } from 'src/application/modules/weather.module';
 import { HttpModule } from './http.module';
 import { CacheModule } from './cache.module';
 import { EmailModule } from './email.module';
-import { NotificationService } from '../notification/notification.service';
+import { NotificationService } from '../notification/use-cases/notification.service';
 import { NotificationRepository } from 'src/infrastructure/notification/notification.repository';
 
 @Module({
