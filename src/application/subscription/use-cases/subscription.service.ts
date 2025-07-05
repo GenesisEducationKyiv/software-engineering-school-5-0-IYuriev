@@ -1,6 +1,7 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
-import { CreateSubscriptionDto } from '../dto/create-subscription.dto';
+import { SubscriptionProvider } from '../../../core/subscription/subscription-service.interface';
 import {
+  SubscriptionPayload,
   SubscriptionRepo,
   SubscriptionRepositoryToken,
 } from '../../../core/subscription/subscription-repoository.interface';
@@ -12,7 +13,6 @@ import {
   TokenProvider,
   TokenServiceToken,
 } from '../../../core/token/token-service.interface';
-import { SubscriptionProvider } from '../../../core/subscription/subscription-service.interface';
 
 @Injectable()
 export class SubscriptionService implements SubscriptionProvider {
@@ -23,13 +23,13 @@ export class SubscriptionService implements SubscriptionProvider {
     @Inject(TokenServiceToken) private readonly tokenService: TokenProvider,
   ) {}
 
-  async subscribe(dto: CreateSubscriptionDto): Promise<void> {
-    const existing = await this.subscriptionRepo.findSubscription(dto);
+  async subscribe(payload: SubscriptionPayload): Promise<void> {
+    const existing = await this.subscriptionRepo.findSubscription(payload);
     if (existing) throw new ConflictException('Email already subscribed');
 
-    const subscription = await this.subscriptionRepo.create(dto);
+    const subscription = await this.subscriptionRepo.create(payload);
     const token = await this.tokenService.createConfirmToken(subscription.id);
-    await this.emailService.sendConfirmationEmail(dto.email, token);
+    await this.emailService.sendConfirmationEmail(payload.email, token);
   }
 
   async confirm(token: string): Promise<void> {
