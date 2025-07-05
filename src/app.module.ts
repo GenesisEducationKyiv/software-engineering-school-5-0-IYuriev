@@ -6,16 +6,16 @@ import {
 } from '@nestjs/common';
 import { LoggingMiddleware } from './common/middlewares/logger.middleware';
 import { ConfigModule } from '@nestjs/config';
-import { WeatherModule } from './weather/weather.module';
-import { SubscriptionModule } from './subscription/subscription.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { TokenModule } from './token/token.module';
-import { NotificationModule } from './notification/notification.module';
+import { WeatherModule } from './application/modules/weather.module';
+import { SubscriptionModule } from './application/modules/subscription.module';
+import { NotificationModule } from './application/modules/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { CacheModule } from './cache/cache.module';
-import { WeatherClientModule } from './weather-client/weather-client.module';
-import { LoggerModule } from './infrastructure/logger/logger.module';
+import { WeatherClientModule } from './application/modules/weather-client.module';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { LoggerModule } from './application/modules/logger.module';
+import { PrismaModule } from './application/modules/prisma.module';
+import { TokenModule } from './application/modules/token.module';
+import { CacheModule } from './application/modules/cache.module';
 
 @Module({
   imports: [

@@ -1,7 +1,7 @@
-import { WeatherProvider } from '../../weather-client/weather-client.provider';
 import { WeatherResponse } from '../../constants/types/weather';
 import { WinstonLogger } from '../../infrastructure/logger/logger.service';
-import { CityValidatable } from '../../weather/interfaces/weather-service.interface';
+import { CityValidatable } from '../../core/weather/weather.interface';
+import { WeatherProvider } from 'src/infrastructure/weather/weather-client.provider';
 
 export class LogWeatherClientDecorator extends WeatherProvider {
   constructor(
