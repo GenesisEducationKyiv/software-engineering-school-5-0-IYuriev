@@ -1,11 +1,18 @@
-import { Frequency } from '../../constants/enums/subscription';
 import { Subscription } from '../../constants/types/subscription';
-import { CreateSubscriptionDto } from '../../application/subscription/dto/create-subscription.dto';
+import { Frequency } from './subscription.entity';
+
+export type CreateSubscriptionPayload = {
+  email: string;
+  city: string;
+  frequency: Frequency;
+};
 
 export interface SubscriptionRepo {
   getConfirmedSubscriptions(frequency: Frequency): Promise<Subscription[]>;
-  findSubscription(dto: CreateSubscriptionDto): Promise<Subscription | null>;
-  create(dto: CreateSubscriptionDto): Promise<Subscription>;
+  findSubscription(
+    payload: CreateSubscriptionPayload,
+  ): Promise<Subscription | null>;
+  create(payload: CreateSubscriptionPayload): Promise<Subscription>;
   confirm(id: number): Promise<void>;
   delete(id: number): Promise<void>;
 }

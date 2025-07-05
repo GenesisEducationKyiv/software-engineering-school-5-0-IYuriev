@@ -3,7 +3,7 @@ import { WeatherService } from '../weather/use-cases/weather.service';
 import { WeatherController } from '../../presentation/weather.controller';
 import { WeatherClientModule } from 'src/application/modules/weather-client.module';
 import { WeatherClientToken } from 'src/core/weather/weather.interface';
-import { WeatherFactory } from '../weather/weather-factory';
+import { WeatherFactory } from '../../infrastructure/factories/weather-factory';
 import { LoggerModule } from './logger.module';
 import { CacheModule } from './cache.module';
 

@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Frequency } from 'src/constants/enums/subscription';
+import { Frequency } from 'src/core/subscription/subscription.entity';
 import {
   NotificationRepo,
   NotificationRepositoryToken,

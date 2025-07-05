@@ -1,5 +1,9 @@
-import { Frequency } from '../../constants/enums/subscription';
 import { TokenEntity } from '../token/token.entity';
+
+export enum Frequency {
+  HOURLY = 'hourly',
+  DAILY = 'daily',
+}
 
 export interface SubscriptionEntity {
   id: number;

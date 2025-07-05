@@ -1,7 +1,7 @@
-import { CreateSubscriptionDto } from '../../application/subscription/dto/create-subscription.dto';
+import { CreateSubscriptionPayload } from './subscription-repoository.interface';
 
 export interface SubscriptionProvider {
-  subscribe(dto: CreateSubscriptionDto): Promise<void>;
+  subscribe(payload: CreateSubscriptionPayload): Promise<void>;
   confirm(token: string): Promise<void>;
   unsubscribe(token: string): Promise<void>;
 }

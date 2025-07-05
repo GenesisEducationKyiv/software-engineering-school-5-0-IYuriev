@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { SubscriptionRepo } from 'src/core/subscription/subscription-repoository.interface';
+import {
+  CreateSubscriptionPayload,
+  SubscriptionRepo,
+} from 'src/core/subscription/subscription-repoository.interface';
 import { PrismaService } from '../prisma/prisma.service';
-import { Frequency } from 'src/constants/enums/subscription';
+import { Frequency } from 'src/core/subscription/subscription.entity';
 import { Subscription } from 'src/constants/types/subscription';
-import { CreateSubscriptionDto } from 'src/application/subscription/dto/create-subscription.dto';
 
 @Injectable()
 export class SubscriptionRepository implements SubscriptionRepo {
@@ -26,19 +28,23 @@ export class SubscriptionRepository implements SubscriptionRepo {
   }
 
   async findSubscription(
-    dto: CreateSubscriptionDto,
+    payload: CreateSubscriptionPayload,
   ): Promise<Subscription | null> {
     return this.prisma.subscription.findFirst({
-      where: { email: dto.email, city: dto.city, frequency: dto.frequency },
+      where: {
+        email: payload.email,
+        city: payload.city,
+        frequency: payload.frequency,
+      },
     });
   }
 
-  async create(dto: CreateSubscriptionDto): Promise<Subscription> {
+  async create(payload: CreateSubscriptionPayload): Promise<Subscription> {
     return this.prisma.subscription.create({
       data: {
-        email: dto.email,
-        city: dto.city,
-        frequency: dto.frequency,
+        email: payload.email,
+        city: payload.city,
+        frequency: payload.frequency,
       },
     });
   }
