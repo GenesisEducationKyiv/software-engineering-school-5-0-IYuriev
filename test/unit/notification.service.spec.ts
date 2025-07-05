@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Frequency } from '../../src/constants/enums/subscription';
 import { SubscriptionRepositoryToken } from '../../src/core/subscription/subscription-repoository.interface';
 import { NotificationRepositoryToken } from '../../src/core/notification/notification-repository.interface';
 import { NotificationService } from 'src/application/notification/notification.service';
+import { Frequency } from 'src/core/subscription/subscription.entity';
 
 describe('NotificationService', () => {
   let service: NotificationService;
