@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { TokenRepo } from '../../core/token/token-repository.interface';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
-import { Token } from '../../constants/types/token';
+import { TokenEntity } from 'src/core/token/token.entity';
 
 @Injectable()
 export class TokenRepository implements TokenRepo {
@@ -11,7 +11,7 @@ export class TokenRepository implements TokenRepo {
     await this.prisma.token.create({ data: { token, subscriptionId } });
   }
 
-  async findByToken(token: string): Promise<Token | null> {
+  async findByToken(token: string): Promise<TokenEntity | null> {
     return this.prisma.token.findUnique({ where: { token } });
   }
 }

@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import {
-  CreateSubscriptionPayload,
+  SubscriptionPayload,
   SubscriptionRepo,
 } from 'src/core/subscription/subscription-repoository.interface';
 import { PrismaService } from '../prisma/prisma.service';
-import { Frequency } from 'src/core/subscription/subscription.entity';
-import { Subscription } from 'src/constants/types/subscription';
+import {
+  Frequency,
+  SubscriptionEntity,
+} from 'src/core/subscription/subscription.entity';
+import { mapToSubscriptionEntity } from '../mappers/subscription.mapper';
 
 @Injectable()
 export class SubscriptionRepository implements SubscriptionRepo {
@@ -13,40 +16,34 @@ export class SubscriptionRepository implements SubscriptionRepo {
 
   async getConfirmedSubscriptions(
     frequency: Frequency,
-  ): Promise<Subscription[]> {
+  ): Promise<SubscriptionEntity[]> {
     const subs = await this.prisma.subscription.findMany({
       where: { confirmed: true, frequency },
       include: { tokens: true },
     });
-    return subs.map((sub) => ({
-      id: sub.id,
-      email: sub.email,
-      city: sub.city,
-      token: sub.tokens[0]?.token,
-      confirmed: sub.confirmed,
-    }));
+    return subs.map(mapToSubscriptionEntity);
   }
 
   async findSubscription(
-    payload: CreateSubscriptionPayload,
-  ): Promise<Subscription | null> {
-    return this.prisma.subscription.findFirst({
-      where: {
-        email: payload.email,
-        city: payload.city,
-        frequency: payload.frequency,
-      },
+    payload: SubscriptionPayload,
+  ): Promise<SubscriptionEntity | null> {
+    const { email, city, frequency } = payload;
+    const subscription = await this.prisma.subscription.findFirst({
+      where: { email, city, frequency },
+      include: { tokens: true },
     });
+
+    return subscription ? mapToSubscriptionEntity(subscription) : null;
   }
 
-  async create(payload: CreateSubscriptionPayload): Promise<Subscription> {
-    return this.prisma.subscription.create({
-      data: {
-        email: payload.email,
-        city: payload.city,
-        frequency: payload.frequency,
-      },
+  async create(payload: SubscriptionPayload): Promise<SubscriptionEntity> {
+    const { email, city, frequency } = payload;
+    const subscription = await this.prisma.subscription.create({
+      data: { email, city, frequency },
+      include: { tokens: true },
     });
+
+    return mapToSubscriptionEntity(subscription);
   }
 
   async confirm(id: number): Promise<void> {

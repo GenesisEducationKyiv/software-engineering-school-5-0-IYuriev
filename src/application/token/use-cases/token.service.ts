@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { Token } from 'src/constants/types/token';
+import { TokenEntity } from 'src/core/token/token.entity';
 import { TokenProvider } from 'src/core/token/token-service.interface';
 import {
   TokenRepo,
@@ -20,7 +20,7 @@ export class TokenService implements TokenProvider {
     return token;
   }
 
-  async getValidToken(token: string): Promise<Token> {
+  async getValidToken(token: string): Promise<TokenEntity> {
     const dbToken = await this.tokenRepo.findByToken(token);
     if (!dbToken) throw new BadRequestException('Invalid token');
     return dbToken;

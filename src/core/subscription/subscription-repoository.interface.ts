@@ -1,18 +1,19 @@
-import { Subscription } from '../../constants/types/subscription';
-import { Frequency } from './subscription.entity';
+import { Frequency, SubscriptionEntity } from './subscription.entity';
 
-export type CreateSubscriptionPayload = {
+export type SubscriptionPayload = {
   email: string;
   city: string;
   frequency: Frequency;
 };
 
 export interface SubscriptionRepo {
-  getConfirmedSubscriptions(frequency: Frequency): Promise<Subscription[]>;
+  getConfirmedSubscriptions(
+    frequency: Frequency,
+  ): Promise<SubscriptionEntity[]>;
   findSubscription(
-    payload: CreateSubscriptionPayload,
-  ): Promise<Subscription | null>;
-  create(payload: CreateSubscriptionPayload): Promise<Subscription>;
+    payload: SubscriptionPayload,
+  ): Promise<SubscriptionEntity | null>;
+  create(payload: SubscriptionPayload): Promise<SubscriptionEntity>;
   confirm(id: number): Promise<void>;
   delete(id: number): Promise<void>;
 }
