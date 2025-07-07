@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WeatherService } from 'src/application/weather/use-cases/weather.service';
-import { WeatherResponse } from 'src/constants/types/weather';
+import { Weather } from 'src/core/weather/weather.entity';
 import {
   WeatherClient,
   WeatherClientToken,
@@ -38,7 +38,7 @@ describe('WeatherService', () => {
 
   it('should delegate getWeather to WeatherClient', async () => {
     const city = 'Kyiv';
-    const mockResponse: WeatherResponse = {
+    const mockResponse: Weather = {
       temperature: 20,
       humidity: 60,
       description: 'Sunny',
@@ -59,7 +59,7 @@ describe('WeatherService', () => {
 
   it('should call getWeather with different cities', async () => {
     const cities = ['Paris', 'Berlin', 'Tokyo'];
-    const responses: WeatherResponse[] = [
+    const responses: Weather[] = [
       { temperature: 18, humidity: 55, description: 'Cloudy' },
       { temperature: 22, humidity: 50, description: 'Clear' },
       { temperature: 25, humidity: 70, description: 'Rainy' },
@@ -78,7 +78,7 @@ describe('WeatherService', () => {
   });
 
   it('should handle empty city string', async () => {
-    const mockResponse: WeatherResponse = {
+    const mockResponse: Weather = {
       temperature: 0,
       humidity: 0,
       description: 'Unknown',
