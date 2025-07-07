@@ -1,7 +1,7 @@
-import { WeatherResponse } from '../../constants/types/weather';
+import { Weather } from './weather.entity';
 
 export interface WeatherClient {
-  getWeather(city: string): Promise<WeatherResponse>;
+  getWeather(city: string): Promise<Weather>;
 }
 
 export interface CityValidatable {

@@ -1,5 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
-import { WeatherResponse } from 'src/constants/types/weather';
+import { Weather } from 'src/core/weather/weather.entity';
 
 export abstract class WeatherProvider {
   private nextHandler: WeatherProvider;
@@ -9,7 +9,7 @@ export abstract class WeatherProvider {
     return handler;
   }
 
-  async handle(city: string): Promise<WeatherResponse> {
+  async handle(city: string): Promise<Weather> {
     try {
       return await this.getWeather(city);
     } catch {
@@ -31,6 +31,6 @@ export abstract class WeatherProvider {
     }
   }
 
-  protected abstract getWeather(city: string): Promise<WeatherResponse>;
+  protected abstract getWeather(city: string): Promise<Weather>;
   protected abstract validateCity(city: string): Promise<string>;
 }

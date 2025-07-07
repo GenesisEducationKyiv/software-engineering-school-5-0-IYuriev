@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WeatherApiEndpoint } from '../../constants/enums/weather';
-import { WeatherAPIData, WeatherResponse } from '../../constants/types/weather';
+import { WeatherAPIData } from '../../constants/types/weather';
+import { Weather } from '../../core/weather/weather.entity';
 import { CityResponse } from 'src/constants/types/city';
 import { HttpClient } from 'src/infrastructure/http/http.client';
 import {
@@ -27,7 +28,7 @@ export class WeatherApiClient
     this.WEATHER_API_URL = this.config.get<string>('WEATHER_API_URL', '');
   }
 
-  async getWeather(city: string): Promise<WeatherResponse> {
+  async getWeather(city: string): Promise<Weather> {
     const data = await this.fetchWeather(city);
     return {
       temperature: data.current.temp_c,

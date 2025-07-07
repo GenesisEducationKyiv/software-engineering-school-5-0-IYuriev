@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CacheKey } from '../../../constants/enums/cache';
-import { WeatherResponse } from '../../../constants/types/weather';
+import { Weather } from 'src/core/weather/weather.entity';
 import {
   CityValidatable,
   WeatherClient,
@@ -15,11 +15,11 @@ export class CacheWeatherClientProxy implements WeatherClient {
     private readonly cacheService: CacheService,
   ) {}
 
-  async getWeather(city: string): Promise<WeatherResponse> {
+  async getWeather(city: string): Promise<Weather> {
     const cacheKey = this.getCacheKey(city);
     const cachedData = await this.cacheService.get(cacheKey);
     if (cachedData) {
-      return JSON.parse(cachedData) as WeatherResponse;
+      return JSON.parse(cachedData) as Weather;
     }
 
     const weather = await this.provider.handle(city);

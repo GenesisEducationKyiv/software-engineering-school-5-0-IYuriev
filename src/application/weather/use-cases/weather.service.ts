@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { WeatherResponse } from '../../../constants/types/weather';
+import { Weather } from '../../../core/weather/weather.entity';
 import {
   WeatherClient,
   WeatherClientToken,
@@ -12,7 +12,7 @@ export class WeatherService implements WeatherClient {
     private readonly client: WeatherClient,
   ) {}
 
-  async getWeather(city: string): Promise<WeatherResponse> {
+  async getWeather(city: string): Promise<Weather> {
     return this.client.getWeather(city);
   }
 }

@@ -100,9 +100,3 @@ export type OpenWeatherData = {
   name: string;
   cod: number;
 };
-
-export type WeatherResponse = {
-  temperature: number;
-  humidity: number;
-  description: string;
-};

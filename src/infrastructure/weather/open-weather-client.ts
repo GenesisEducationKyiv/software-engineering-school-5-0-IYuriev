@@ -1,7 +1,8 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { HttpClient } from 'src/infrastructure/http/http.client';
 import { ConfigService } from '@nestjs/config';
-import { OpenWeatherData, WeatherResponse } from 'src/constants/types/weather';
+import { OpenWeatherData } from 'src/constants/types/weather';
+import { Weather } from 'src/core/weather/weather.entity';
 import { WeatherProvider } from './weather-client.provider';
 import {
   CityValidatable,
@@ -25,7 +26,7 @@ export class OpenWeatherClient
     this.WEATHER_API_URL = this.config.get<string>('OPEN_WEATHER_API_URL', '');
   }
 
-  async getWeather(city: string): Promise<WeatherResponse> {
+  async getWeather(city: string): Promise<Weather> {
     const data = await this.fetchWeather(city);
     return {
       temperature: data.main.temp,
