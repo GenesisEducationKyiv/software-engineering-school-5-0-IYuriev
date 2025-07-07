@@ -1,6 +1,6 @@
-import { WeatherResponse } from '../../constants/types/weather';
-import { WinstonLogger } from '../../infrastructure/logger/logger.service';
-import { CityValidatable } from '../../core/weather/weather.interface';
+import { WeatherResponse } from 'src/constants/types/weather';
+import { CityValidatable } from 'src/core/weather/weather.interface';
+import { WinstonLogger } from 'src/infrastructure/logger/logger.service';
 import { WeatherProvider } from 'src/infrastructure/weather/weather-client.provider';
 
 export class LogWeatherClientDecorator extends WeatherProvider {

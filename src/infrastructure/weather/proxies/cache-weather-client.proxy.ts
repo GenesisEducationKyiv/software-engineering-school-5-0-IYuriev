@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CacheKey } from '../../constants/enums/cache';
-import { WeatherResponse } from '../../constants/types/weather';
+import { CacheKey } from '../../../constants/enums/cache';
+import { WeatherResponse } from '../../../constants/types/weather';
 import {
   CityValidatable,
   WeatherClient,
-} from '../../core/weather/weather.interface';
+} from '../../../core/weather/weather.interface';
 import { WeatherProvider } from 'src/infrastructure/weather/weather-client.provider';
 import { CacheService } from 'src/core/cache/cache.abstract';
 

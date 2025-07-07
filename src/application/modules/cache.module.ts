@@ -3,7 +3,7 @@ import { MetricsModule } from './metrics.module';
 import { RedisCacheService } from 'src/infrastructure/cache/cache.service';
 import { CacheService } from 'src/core/cache/cache.abstract';
 import { MetricsService } from 'src/infrastructure/metrics/metrics.service';
-import { MetricsCacheDecorator } from 'src/common/decorators/metrics-cache.decorator';
+import { MetricsCacheDecorator } from 'src/infrastructure/cache/decorators/metrics-cache.decorator';
 
 @Module({
   imports: [MetricsModule],
