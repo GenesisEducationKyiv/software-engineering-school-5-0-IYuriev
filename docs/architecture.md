@@ -3,11 +3,11 @@ flowchart TD
     Core["Core
     (Entities, Interfaces)"]
     Application["Application
-    (Use Cases, DTOs, Modules)"]
+    (Use Cases, Interfaces, Modules)"]
     Infrastructure["Infrastructure
     (DB, Services, Repositories, Providers)"]
     Presentation["Presentation
-    (Controllers)"]
+    (Controllers, DTOs)"]
 
     Application --> Core
     Infrastructure --> Core
