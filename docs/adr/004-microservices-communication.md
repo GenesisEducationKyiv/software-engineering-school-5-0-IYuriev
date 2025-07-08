@@ -78,14 +78,15 @@ graph TB
     APIGateway -->|gRPC| Subscription
     APIGateway -->|gRPC| Weather
 
-    Subscription -->|gRPC| Notification
+    Notification -->|gRPC| Subscription
+    Notification -->|gRPC| Weather
     Notification -->|gRPC| Email
 
     Subscription -->|SQL| PostgreSQL
-    Weather -->|HTTP| WeatherAPI
-    Weather -->|HTTP| OpenWeather
-    Weather -->|Cache| Redis
-    Email -->|HTTP| Resend
+    Weather -->|HTTPS| WeatherAPI
+    Weather -->|HTTPS| OpenWeather
+    Weather -->|TCP| Redis
+    Email -->|HTTPS| Resend
 ```
 
 ## Consequences
