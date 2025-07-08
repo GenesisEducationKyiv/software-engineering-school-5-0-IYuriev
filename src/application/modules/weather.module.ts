@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { WeatherService } from '../weather/use-cases/weather.service';
-import { WeatherController } from '../../presentation/weather.controller';
+import { WeatherController } from '../../presentation/weather/weather.controller';
 import { WeatherClientModule } from 'src/application/modules/weather-client.module';
 import { WeatherClientToken } from 'src/core/weather/weather.interface';
 import { WeatherFactory } from '../../infrastructure/factories/weather-factory';

@@ -1,6 +1,6 @@
 import { ConflictException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { CreateSubscriptionDto } from 'src/application/subscription/dto/create-subscription.dto';
+import { CreateSubscriptionDto } from 'src/presentation/subscription/dto/create-subscription.dto';
 import { SubscriptionService } from 'src/application/subscription/use-cases/subscription.service';
 import { EmailServiceToken } from 'src/application/email/email-service.interface';
 import { SubscriptionRepositoryToken } from 'src/application/subscription/interfaces/subscription-repoository.interface';

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { EmailService } from 'src/infrastructure/email/email.service';
 import { WeatherService } from 'src/application/weather/use-cases/weather.service';
-import { NotificationRepositoryToken } from '../../core/notification/notification-repository.interface';
+import { NotificationRepositoryToken } from '../notification/interfaces/notification-repository.interface';
 import { SubscriptionModule } from 'src/application/modules/subscription.module';
 import { WeatherModule } from 'src/application/modules/weather.module';
 import { HttpModule } from './http.module';

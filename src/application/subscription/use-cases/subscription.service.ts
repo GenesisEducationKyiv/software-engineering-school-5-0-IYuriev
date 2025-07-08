@@ -1,10 +1,12 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
-import { SubscriptionProvider } from '../../../core/subscription/subscription-service.interface';
 import {
   SubscriptionPayload,
+  SubscriptionProvider,
+} from '../../../core/subscription/subscription-service.interface';
+import {
   SubscriptionRepo,
   SubscriptionRepositoryToken,
-} from '../../../core/subscription/subscription-repoository.interface';
+} from '../interfaces/subscription-repoository.interface';
 import {
   EmailServiceToken,
   EmailProvider,

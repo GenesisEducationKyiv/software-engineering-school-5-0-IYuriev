@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TokenService } from '../token/use-cases/token.service';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { TokenRepository } from 'src/infrastructure/token/token.repository';
-import { TokenRepositoryToken } from 'src/core/token/token-repository.interface';
+import { TokenRepositoryToken } from 'src/application/token/interfaces/token-repository.interface';
 import { TokenServiceToken } from 'src/core/token/token-service.interface';
 
 @Module({
