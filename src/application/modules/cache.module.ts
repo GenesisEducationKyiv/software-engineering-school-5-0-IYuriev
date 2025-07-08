@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MetricsModule } from './metrics.module';
 import { RedisCacheService } from 'src/infrastructure/cache/cache.service';
-import { CacheService } from 'src/core/cache/cache.abstract';
+import { CacheService } from 'src/application/cache/cache.abstract';
 import { MetricsService } from 'src/infrastructure/metrics/metrics.service';
 import { MetricsCacheDecorator } from 'src/infrastructure/cache/decorators/metrics-cache.decorator';
 

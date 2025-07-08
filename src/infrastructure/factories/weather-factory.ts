@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { WeatherClient } from '../../core/weather/weather.interface';
-import { CacheService } from '../../core/cache/cache.abstract';
+import { CacheService } from '../../application/cache/cache.abstract';
 import { WinstonLogger } from '../logger/logger.service';
 import { CacheWeatherClientProxy } from '../weather/proxies/cache-weather-client.proxy';
 import { WeatherApiClient } from '../weather/weather-api-client';

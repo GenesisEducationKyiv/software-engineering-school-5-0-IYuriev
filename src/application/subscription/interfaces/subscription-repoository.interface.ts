@@ -1,10 +1,8 @@
-import { Frequency, SubscriptionEntity } from './subscription.entity';
-
-export type SubscriptionPayload = {
-  email: string;
-  city: string;
-  frequency: Frequency;
-};
+import { SubscriptionPayload } from 'src/core/subscription/subscription-service.interface';
+import {
+  Frequency,
+  SubscriptionEntity,
+} from 'src/core/subscription/subscription.entity';
 
 export interface SubscriptionRepo {
   getConfirmedSubscriptions(

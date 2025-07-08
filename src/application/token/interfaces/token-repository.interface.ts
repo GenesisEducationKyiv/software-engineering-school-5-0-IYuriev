@@ -1,4 +1,4 @@
-import { TokenEntity } from './token.entity';
+import { TokenEntity } from 'src/core/token/token.entity';
 
 export interface TokenRepo {
   create(token: string, subscriptionId: number): Promise<void>;

@@ -6,7 +6,7 @@ import {
   WeatherClient,
 } from '../../../core/weather/weather.interface';
 import { WeatherProvider } from 'src/infrastructure/weather/weather-client.provider';
-import { CacheService } from 'src/core/cache/cache.abstract';
+import { CacheService } from 'src/application/cache/cache.abstract';
 
 @Injectable()
 export class CacheWeatherClientProxy implements WeatherClient {

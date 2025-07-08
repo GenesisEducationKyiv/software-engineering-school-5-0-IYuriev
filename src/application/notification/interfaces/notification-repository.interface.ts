@@ -1,4 +1,4 @@
-import { Subscription } from '../../constants/types/subscription';
+import { Subscription } from 'src/constants/types/subscription';
 
 export interface NotificationRepo {
   send(sub: Subscription): Promise<void>;

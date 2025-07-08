@@ -4,12 +4,12 @@ import { Frequency } from 'src/core/subscription/subscription.entity';
 import {
   NotificationRepo,
   NotificationRepositoryToken,
-} from 'src/core/notification/notification-repository.interface';
+} from 'src/application/notification/interfaces/notification-repository.interface';
 import { NotificationProvider } from 'src/core/notification/notification-service.interface';
 import {
   SubscriptionRepo,
   SubscriptionRepositoryToken,
-} from 'src/core/subscription/subscription-repoository.interface';
+} from 'src/application/subscription/interfaces/subscription-repoository.interface';
 
 @Injectable()
 export class NotificationService implements NotificationProvider {

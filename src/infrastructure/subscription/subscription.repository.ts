@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import {
-  SubscriptionPayload,
-  SubscriptionRepo,
-} from 'src/core/subscription/subscription-repoository.interface';
+import { SubscriptionRepo } from 'src/application/subscription/interfaces/subscription-repoository.interface';
+import { SubscriptionPayload } from 'src/core/subscription/subscription-service.interface';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   Frequency,

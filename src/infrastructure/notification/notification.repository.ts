@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { NotificationRepo } from 'src/core/notification/notification-repository.interface';
+import { NotificationRepo } from 'src/application/notification/interfaces/notification-repository.interface';
 import { EmailService } from '../email/email.service';
 import { WeatherService } from 'src/application/weather/use-cases/weather.service';
 import { ConfigService } from '@nestjs/config';

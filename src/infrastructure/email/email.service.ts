@@ -4,9 +4,9 @@ import { Email } from '../../constants/enums/email';
 import {
   EmailTransport,
   EmailTransportToken,
-} from '../../core/email/email-transport.interface';
+} from '../../application/email/email-transport.interface';
 import { EmailPayload } from '../../constants/types/email';
-import { EmailProvider } from '../../core/email/email-service.interface';
+import { EmailProvider } from '../../application/email/email-service.interface';
 
 @Injectable()
 export class EmailService implements EmailProvider {

@@ -8,7 +8,7 @@ import {
 import {
   EmailServiceToken,
   EmailProvider,
-} from '../../../core/email/email-service.interface';
+} from '../../email/email-service.interface';
 import {
   TokenProvider,
   TokenServiceToken,

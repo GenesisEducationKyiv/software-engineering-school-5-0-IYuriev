@@ -5,7 +5,7 @@ import { TokenProvider } from 'src/core/token/token-service.interface';
 import {
   TokenRepo,
   TokenRepositoryToken,
-} from 'src/core/token/token-repository.interface';
+} from '../interfaces/token-repository.interface';
 
 @Injectable()
 export class TokenService implements TokenProvider {

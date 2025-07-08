@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SubscriptionRepositoryToken } from '../../src/core/subscription/subscription-repoository.interface';
-import { NotificationRepositoryToken } from '../../src/core/notification/notification-repository.interface';
+import { NotificationRepositoryToken } from 'src/application/notification/interfaces/notification-repository.interface';
+import { SubscriptionRepositoryToken } from 'src/application/subscription/interfaces/subscription-repoository.interface';
 import { NotificationService } from 'src/application/notification/use-cases/notification.service';
 import { Frequency } from 'src/core/subscription/subscription.entity';
 

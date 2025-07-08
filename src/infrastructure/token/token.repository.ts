@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { TokenRepo } from '../../core/token/token-repository.interface';
+import { TokenRepo } from 'src/application/token/interfaces/token-repository.interface';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { TokenEntity } from 'src/core/token/token.entity';
 
