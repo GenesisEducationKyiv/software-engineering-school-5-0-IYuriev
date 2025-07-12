@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { Frequency } from 'src/core/subscription/subscription.entity';
+import { Frequency } from 'src/subscription/domain/subscription/subscription.entity';
 
 export class CreateSubscriptionDto {
   @IsNotEmpty()

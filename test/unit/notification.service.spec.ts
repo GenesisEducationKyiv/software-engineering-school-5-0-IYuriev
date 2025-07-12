@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotificationRepositoryToken } from 'src/application/notification/interfaces/notification-repository.interface';
-import { SubscriptionRepositoryToken } from 'src/application/subscription/interfaces/subscription-repoository.interface';
-import { NotificationService } from 'src/application/notification/use-cases/notification.service';
-import { Frequency } from 'src/core/subscription/subscription.entity';
+import { NotificationRepositoryToken } from 'src/notification/application/interfaces/notification-repository.interface';
+import { SubscriptionRepositoryToken } from 'src/subscription/application/subscription/interfaces/subscription-repoository.interface';
+import { NotificationService } from 'src/notification/application/use-case/notification.service';
+import { Frequency } from 'src/subscription/domain/subscription/subscription.entity';
 
 describe('NotificationService', () => {
   let service: NotificationService;

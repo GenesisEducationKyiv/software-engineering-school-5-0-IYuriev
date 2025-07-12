@@ -6,31 +6,21 @@ import {
 } from '@nestjs/common';
 import { LoggingMiddleware } from './common/middlewares/logger.middleware';
 import { ConfigModule } from '@nestjs/config';
-import { WeatherModule } from './application/modules/weather.module';
-import { SubscriptionModule } from './application/modules/subscription.module';
-import { NotificationModule } from './application/modules/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { WeatherClientModule } from './application/modules/weather-client.module';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
-import { LoggerModule } from './application/modules/logger.module';
-import { PrismaModule } from './application/modules/prisma.module';
-import { TokenModule } from './application/modules/token.module';
-import { CacheModule } from './application/modules/cache.module';
+import { SubscriptionControllerModule } from './presentation/subscription/subscription-controller.module';
+import { NotificationModule } from './notification/notification.module';
+import { WeatherControllerModule } from './presentation/weather/weather-controller.module';
 
 @Module({
   imports: [
-    LoggerModule,
+    NotificationModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    WeatherModule,
-    SubscriptionModule,
-    PrismaModule,
     ScheduleModule.forRoot(),
-    TokenModule,
-    NotificationModule,
-    CacheModule,
-    WeatherClientModule,
+    SubscriptionControllerModule,
+    WeatherControllerModule,
     PrometheusModule.register({
       defaultMetrics: {
         enabled: false,

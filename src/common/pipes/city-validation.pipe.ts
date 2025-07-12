@@ -1,9 +1,7 @@
 import { PipeTransform, Injectable, Inject } from '@nestjs/common';
 import { CreateSubscriptionDto } from '../../presentation/subscription/dto/create-subscription.dto';
-import {
-  CityValidatable,
-  WeatherClientToken,
-} from '../../core/weather/weather.interface';
+import { CityValidatable } from 'src/weather/domain/weather.interface';
+import { WeatherClientToken } from 'src/weather/domain/weather.interface';
 import { GetWeatherDto } from 'src/presentation/weather/dto/get-weather.dto';
 
 @Injectable()

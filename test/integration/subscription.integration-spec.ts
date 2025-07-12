@@ -2,7 +2,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
-import { PrismaService } from '../../src/infrastructure/prisma/prisma.service';
+import { PrismaService } from '../../src/subscription/infrastucture/prisma/prisma.service';
 import * as request from 'supertest';
 
 describe('Subscription API (Integration)', () => {

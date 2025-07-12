@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { WeatherService } from 'src/application/weather/use-cases/weather.service';
-import { Weather } from 'src/core/weather/weather.entity';
+import { WeatherService } from 'src/weather/application/weather.service';
+import { Weather } from 'src/weather/domain/weather.entity';
 import {
   WeatherClient,
   WeatherClientToken,
