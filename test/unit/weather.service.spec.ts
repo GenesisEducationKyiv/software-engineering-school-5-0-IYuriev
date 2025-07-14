@@ -4,7 +4,7 @@ import { Weather } from 'src/weather/domain/weather.entity';
 import {
   WeatherClient,
   WeatherClientToken,
-} from 'src/core/weather/weather.interface';
+} from 'src/weather/domain/weather.interface';
 
 describe('WeatherService', () => {
   let service: WeatherService;

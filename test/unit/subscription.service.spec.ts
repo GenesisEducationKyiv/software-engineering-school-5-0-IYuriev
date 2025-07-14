@@ -2,10 +2,10 @@ import { ConflictException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateSubscriptionDto } from 'src/presentation/subscription/dto/create-subscription.dto';
 import { SubscriptionService } from 'src/subscription/application/subscription/use-cases/subscription.service';
-import { EmailServiceToken } from 'src/email/domain/email-service.interface';
 import { SubscriptionRepositoryToken } from 'src/subscription/application/subscription/interfaces/subscription-repoository.interface';
 import { Frequency } from 'src/subscription/domain/subscription/subscription.entity';
 import { TokenServiceToken } from 'src/subscription/domain/token/token-service.interface';
+import { EmailClient } from 'src/email/presentation/email.clinet';
 
 describe('SubscriptionService', () => {
   let service: SubscriptionService;
@@ -19,8 +19,8 @@ describe('SubscriptionService', () => {
     createConfirmToken: jest.Mock;
     getValidToken: jest.Mock;
   };
-  let mockEmailService: {
-    sendEmail: jest.Mock;
+  let mockEmailClient: {
+    sendForecastEmail: jest.Mock;
     sendConfirmationEmail: jest.Mock;
   };
 
@@ -35,8 +35,8 @@ describe('SubscriptionService', () => {
       createConfirmToken: jest.fn(),
       getValidToken: jest.fn(),
     };
-    mockEmailService = {
-      sendEmail: jest.fn(),
+    mockEmailClient = {
+      sendForecastEmail: jest.fn(),
       sendConfirmationEmail: jest.fn(),
     };
 
@@ -48,7 +48,7 @@ describe('SubscriptionService', () => {
           useValue: mockSubscriptionRepo,
         },
         { provide: TokenServiceToken, useValue: mockTokenService },
-        { provide: EmailServiceToken, useValue: mockEmailService },
+        { provide: EmailClient, useValue: mockEmailClient },
       ],
     }).compile();
 
@@ -82,7 +82,7 @@ describe('SubscriptionService', () => {
 
       expect(mockSubscriptionRepo.create).toHaveBeenCalledWith(dto);
       expect(mockTokenService.createConfirmToken).toHaveBeenCalledWith(1);
-      expect(mockEmailService.sendConfirmationEmail).toHaveBeenCalledWith(
+      expect(mockEmailClient.sendConfirmationEmail).toHaveBeenCalledWith(
         'test@example.com',
         'token123',
       );

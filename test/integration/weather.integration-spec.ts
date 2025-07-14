@@ -24,7 +24,7 @@ describe('Weather API (Integration)', () => {
 
   it('should return weather for a valid city', async () => {
     const res = await request(app.getHttpServer())
-      .get('/api/weather?city=Kyiv')
+      .get('/api/weather/Kyiv')
       .expect(200);
 
     expect(res.body).toHaveProperty('temperature');

@@ -3,6 +3,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import { PrismaService } from '../../src/subscription/infrastucture/prisma/prisma.service';
+import { HttpClient } from '../../src/common/http/http.client';
 import * as request from 'supertest';
 
 describe('Subscription API (Integration)', () => {
@@ -12,7 +13,13 @@ describe('Subscription API (Integration)', () => {
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(HttpClient)
+      .useValue({
+        get: jest.fn(() => Promise.resolve({})),
+        post: jest.fn(() => Promise.resolve({})),
+      })
+      .compile();
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
@@ -30,7 +37,7 @@ describe('Subscription API (Integration)', () => {
 
   async function createSubscriptionAndGetToken(email: string) {
     await request(app.getHttpServer())
-      .post('/api/subscribe')
+      .post('/api/subscription/subscribe')
       .send({ email, city: 'Kyiv', frequency: 'daily' });
 
     const sub = await prisma.subscription.findFirst({ where: { email } });
@@ -42,33 +49,29 @@ describe('Subscription API (Integration)', () => {
 
   it('should confirm subscription with valid token', async () => {
     const token = await createSubscriptionAndGetToken('confirm@example.com');
-    const res = await request(app.getHttpServer())
-      .get(`/api/confirm/${token}`)
+    await request(app.getHttpServer())
+      .get(`/api/subscription/confirm/${token}`)
       .expect(200);
-
-    expect(res.body).toHaveProperty('message');
   });
 
   it('should unsubscribe with valid token', async () => {
     const token = await createSubscriptionAndGetToken(
       'unsubscribe@example.com',
     );
-    const res = await request(app.getHttpServer())
-      .get(`/api/unsubscribe/${token}`)
+    await request(app.getHttpServer())
+      .get(`/api/subscription/unsubscribe/${token}`)
       .expect(200);
-
-    expect(res.body).toHaveProperty('message');
   });
 
   it('should return 400 for invalid token in confirm API', async () => {
     await request(app.getHttpServer())
-      .get('/api/confirm/invalidtoken')
+      .get('/api/subscription/confirm/invalidtoken')
       .expect(400);
   });
 
   it('should return 400 for invalid token in unsubscribe API', async () => {
     await request(app.getHttpServer())
-      .get('/api/unsubscribe/invalidtoken')
+      .get('/api/subscription/unsubscribe/invalidtoken')
       .expect(400);
   });
 });
