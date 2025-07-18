@@ -6,8 +6,12 @@ import {
 } from '../interfaces/notification-repository.interface';
 import { NotificationProvider } from '../../domain/notification-service.interface';
 import { SubscriptionGrpcClient } from '../../infrastructure/clients/subscription.client';
-import { Frequency } from '../../../../../apps/subscription/src/domain/subscription/subscription.entity';
 import { mapPrismaFrequencyToGrpc } from '../../infrastructure/mappers/frequency.mapper';
+
+export enum Frequency {
+  HOURLY = 'hourly',
+  DAILY = 'daily',
+}
 
 @Injectable()
 export class NotificationService implements NotificationProvider {

@@ -4,9 +4,9 @@ import { lastValueFrom } from 'rxjs';
 import {
   SUBSCRIPTION_PACKAGE,
   SubscriptionClient,
+  SubscriptionEntity,
 } from '../../application/interfaces/subscription.client.interface';
 import { GetConfirmedSubscriptionsRequest } from '../../../../../libs/proto/generated/subscription';
-import { SubscriptionEntity } from 'apps/subscription/src/domain/subscription/subscription.entity';
 
 @Injectable()
 export class SubscriptionGrpcClient implements OnModuleInit {

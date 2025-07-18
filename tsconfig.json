@@ -22,7 +22,7 @@
     "paths": {
       "libs/*": ["../../libs/*"],
       "src/*": ["src/*"]
-    }
+    },
   },
   "include": [
     "src/**/*",
@@ -31,7 +31,7 @@
     "public/**/*.js",
     "test",
     "test/**/*.ts",
-    "playwright.config.ts",
-    "jest.integration.config.js"
+    "apps/gateway/test/playwright.config.ts",
+    "apps/gateway/test/jest.integration.config.js"
   ]
 }

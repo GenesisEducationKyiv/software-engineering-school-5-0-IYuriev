@@ -1,7 +1,10 @@
 import { Controller, Get, Query, UsePipes } from '@nestjs/common';
 import { GetWeatherDto } from './dto/get-weather.dto';
-import { WeatherGrpcClient } from '../../infrastructure/clients/weather.client';
-import { CityValidationPipe } from '../../infrastructure/pipes/city.validation.pipe';
+import {
+  Weather,
+  WeatherGrpcClient,
+} from '../../infrastructure/clients/weather.client';
+import { CityValidationPipe } from '../../common/pipes/city.validation.pipe';
 
 @Controller('weather')
 export class WeatherController {
@@ -9,7 +12,7 @@ export class WeatherController {
 
   @UsePipes(CityValidationPipe)
   @Get()
-  async getWeather(@Query() dto: GetWeatherDto) {
+  async getWeather(@Query() dto: GetWeatherDto): Promise<Weather> {
     return await this.weatherService.getWeather(dto);
   }
 }

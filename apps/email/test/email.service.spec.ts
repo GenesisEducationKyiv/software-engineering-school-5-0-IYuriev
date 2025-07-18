@@ -1,9 +1,9 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Email } from 'src/constants/enums/email';
-import { EmailPayload } from 'src/constants/types/email';
-import { EmailTransportToken } from 'src/email/src/application/interfaces/email-transport.interface';
-import { EmailService } from 'src/email/src/application/use-case/email.service';
+import { Email } from '../../../libs/constants/enums/email';
+import { EmailPayload } from '../../../libs/constants/types/email';
+import { EmailTransportToken } from '../src/application/interfaces/email-transport.interface';
+import { EmailService } from '../src/application/use-case/email.service';
 
 describe('EmailService', () => {
   let service: EmailService;

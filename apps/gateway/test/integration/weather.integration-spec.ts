@@ -3,6 +3,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import * as request from 'supertest';
+import { CustomExceptionFilter } from '../../../../libs/common/filters/exception.filter';
 
 describe('Weather API (Integration)', () => {
   let app: INestApplication;
@@ -14,6 +15,7 @@ describe('Weather API (Integration)', () => {
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+    app.useGlobalFilters(new CustomExceptionFilter());
     app.setGlobalPrefix('api');
     await app.init();
   });
@@ -24,7 +26,7 @@ describe('Weather API (Integration)', () => {
 
   it('should return weather for a valid city', async () => {
     const res = await request(app.getHttpServer())
-      .get('/api/weather/Kyiv')
+      .get('/api/weather?city=London')
       .expect(200);
 
     expect(res.body).toHaveProperty('temperature');
@@ -32,9 +34,9 @@ describe('Weather API (Integration)', () => {
     expect(res.body).toHaveProperty('description');
   });
 
-  it('should return 404 for invalid city in weather API', async () => {
+  it('should return 404 for an invalid city', async () => {
     await request(app.getHttpServer())
-      .get('/api/weather?city=InvalidCity')
+      .get('/api/weather?city=NonExistentCityForTest')
       .expect(404);
   });
 

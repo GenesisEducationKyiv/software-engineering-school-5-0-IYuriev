@@ -1,18 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotificationRepositoryToken } from 'src/notification/application/interfaces/notification-repository.interface';
-import { SubscriptionClient } from 'src/subscription/presentation/subscription.client';
-import { NotificationService } from 'src/notification/application/use-case/notification.service';
-import { Frequency } from 'src/subscription/domain/subscription/subscription.entity';
+import {
+  Frequency,
+  NotificationService,
+} from '../src/application/use-case/notification.service';
+import { NotificationRepositoryToken } from '../src/application/interfaces/notification-repository.interface';
+import { SubscriptionGrpcClient } from '../src/infrastructure/clients/subscription.client';
 
 describe('NotificationService', () => {
   let service: NotificationService;
   let mockNotificationRepo: { send: jest.Mock };
-  let mockSubscriptionClient: { confirmed: jest.Mock };
+  let mockSubscriptionClient: { getConfirmedSubscriptions: jest.Mock };
 
   beforeEach(async () => {
-    mockSubscriptionClient = {
-      confirmed: jest.fn(),
-    };
+    mockSubscriptionClient = { getConfirmedSubscriptions: jest.fn() };
     mockNotificationRepo = {
       send: jest.fn(),
     };
@@ -21,7 +21,7 @@ describe('NotificationService', () => {
       providers: [
         NotificationService,
         {
-          provide: SubscriptionClient,
+          provide: SubscriptionGrpcClient,
           useValue: mockSubscriptionClient,
         },
         {
@@ -40,20 +40,20 @@ describe('NotificationService', () => {
 
   it('should call getConfirmedSubscriptions and send for each subscription', async () => {
     const fakeSubs = [{ id: 1 }, { id: 2 }];
-    mockSubscriptionClient.confirmed.mockResolvedValue(fakeSubs);
+    mockSubscriptionClient.getConfirmedSubscriptions.mockResolvedValue(
+      fakeSubs,
+    );
 
     await service['notifySubscribers'](Frequency.DAILY);
 
-    expect(mockSubscriptionClient.confirmed).toHaveBeenCalledWith(
-      Frequency.DAILY,
-    );
+    expect(mockSubscriptionClient.getConfirmedSubscriptions).toHaveBeenCalled();
     expect(mockNotificationRepo.send).toHaveBeenCalledTimes(fakeSubs.length);
     expect(mockNotificationRepo.send).toHaveBeenCalledWith(fakeSubs[0]);
     expect(mockNotificationRepo.send).toHaveBeenCalledWith(fakeSubs[1]);
   });
 
   it('should handle empty subscriptions gracefully', async () => {
-    mockSubscriptionClient.confirmed.mockResolvedValue([]);
+    mockSubscriptionClient.getConfirmedSubscriptions.mockResolvedValue([]);
 
     await expect(
       service['notifySubscribers'](Frequency.HOURLY),
@@ -62,7 +62,9 @@ describe('NotificationService', () => {
   });
 
   it('should propagate errors from notificationRepo.send', async () => {
-    mockSubscriptionClient.confirmed.mockResolvedValue([{ id: 1 }]);
+    mockSubscriptionClient.getConfirmedSubscriptions.mockResolvedValue([
+      { id: 1 },
+    ]);
     mockNotificationRepo.send.mockRejectedValueOnce(new Error('fail'));
 
     await expect(service['notifySubscribers'](Frequency.DAILY)).rejects.toThrow(

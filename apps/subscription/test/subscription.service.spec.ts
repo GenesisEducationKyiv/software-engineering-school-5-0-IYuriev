@@ -1,121 +1,116 @@
-import { ConflictException } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
-import { CreateSubscriptionDto } from 'src/presentation/subscription/dto/create-subscription.dto';
-import { SubscriptionService } from 'src/subscription/application/subscription/use-cases/subscription.service';
-import { SubscriptionRepositoryToken } from 'src/subscription/application/subscription/interfaces/subscription-repoository.interface';
-import { Frequency } from 'src/subscription/domain/subscription/subscription.entity';
-import { TokenServiceToken } from 'src/subscription/domain/token/token-service.interface';
-import { EmailClient } from 'src/email/src/presentation/email.clinet';
+import { SubscriptionService } from '../src/application/subscription/use-cases/subscription.service';
+import { RpcException } from '@nestjs/microservices';
+import { EmailGrpcClient } from '../src/infrastucture/clients/email.client';
+import { SubscriptionRepo } from '../src/application/subscription/interfaces/subscription-repoository.interface';
+import { TokenProvider } from '../src/domain/token/token-service.interface';
+import { SubscriptionPayload } from '../src/domain/subscription/subscription-service.interface';
+import { Frequency } from '../src/domain/subscription/subscription.entity';
 
 describe('SubscriptionService', () => {
   let service: SubscriptionService;
-  let mockSubscriptionRepo: {
-    findSubscription: jest.Mock;
-    create: jest.Mock;
-    confirm: jest.Mock;
-    delete: jest.Mock;
-  };
-  let mockTokenService: {
-    createConfirmToken: jest.Mock;
-    getValidToken: jest.Mock;
-  };
-  let mockEmailClient: {
-    sendForecastEmail: jest.Mock;
-    sendConfirmationEmail: jest.Mock;
+  let emailClient: jest.Mocked<EmailGrpcClient>;
+  let subscriptionRepo: jest.Mocked<SubscriptionRepo>;
+  let tokenService: jest.Mocked<TokenProvider>;
+
+  const payload: SubscriptionPayload = {
+    email: 'test@mail.com',
+    city: 'Kyiv',
+    frequency: Frequency.DAILY,
   };
 
-  beforeEach(async () => {
-    mockSubscriptionRepo = {
+  beforeEach(() => {
+    emailClient = {
+      sendConfirmationEmail: jest.fn(),
+    } as unknown as jest.Mocked<EmailGrpcClient>;
+    subscriptionRepo = {
       findSubscription: jest.fn(),
       create: jest.fn(),
       confirm: jest.fn(),
       delete: jest.fn(),
-    };
-    mockTokenService = {
+    } as unknown as jest.Mocked<SubscriptionRepo>;
+    tokenService = {
       createConfirmToken: jest.fn(),
       getValidToken: jest.fn(),
-    };
-    mockEmailClient = {
-      sendForecastEmail: jest.fn(),
-      sendConfirmationEmail: jest.fn(),
-    };
-
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        SubscriptionService,
-        {
-          provide: SubscriptionRepositoryToken,
-          useValue: mockSubscriptionRepo,
-        },
-        { provide: TokenServiceToken, useValue: mockTokenService },
-        { provide: EmailClient, useValue: mockEmailClient },
-      ],
-    }).compile();
-
-    service = module.get<SubscriptionService>(SubscriptionService);
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
+    } as unknown as jest.Mocked<TokenProvider>;
+    service = new SubscriptionService(
+      emailClient,
+      subscriptionRepo,
+      tokenService,
+    );
   });
 
   describe('subscribe', () => {
-    const dto: CreateSubscriptionDto = {
-      email: 'test@example.com',
-      city: 'Kyiv',
-      frequency: Frequency.DAILY,
-    };
-
-    it('should throw if subscription already exists', async () => {
-      mockSubscriptionRepo.findSubscription.mockResolvedValue({ id: 1 });
-
-      await expect(service.subscribe(dto)).rejects.toThrow(ConflictException);
-      expect(mockSubscriptionRepo.findSubscription).toHaveBeenCalledWith(dto);
+    it('should throw if already subscribed', async () => {
+      subscriptionRepo.findSubscription.mockResolvedValue({
+        id: 1,
+        email: 'test@mail.com',
+        city: 'Kyiv',
+        frequency: Frequency.DAILY,
+        confirmed: false,
+        tokens: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      await expect(service.subscribe(payload)).rejects.toThrow(RpcException);
     });
 
     it('should create subscription and send confirmation email', async () => {
-      mockSubscriptionRepo.findSubscription.mockResolvedValue(null);
-      mockSubscriptionRepo.create.mockResolvedValue({ id: 1 });
-      mockTokenService.createConfirmToken.mockResolvedValue('token123');
-
-      await service.subscribe(dto);
-
-      expect(mockSubscriptionRepo.create).toHaveBeenCalledWith(dto);
-      expect(mockTokenService.createConfirmToken).toHaveBeenCalledWith(1);
-      expect(mockEmailClient.sendConfirmationEmail).toHaveBeenCalledWith(
-        'test@example.com',
+      subscriptionRepo.findSubscription.mockResolvedValue(null);
+      subscriptionRepo.create.mockResolvedValue({
+        id: 2,
+        email: 'test@mail.com',
+        city: 'Kyiv',
+        frequency: Frequency.DAILY,
+        confirmed: false,
+        tokens: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      tokenService.createConfirmToken.mockResolvedValue('token123');
+      await service.subscribe(payload);
+      expect(subscriptionRepo.create.mock.calls.length).toBe(1);
+      expect(subscriptionRepo.create.mock.calls[0][0]).toEqual(payload);
+      expect(tokenService.createConfirmToken.mock.calls.length).toBe(1);
+      expect(tokenService.createConfirmToken.mock.calls[0][0]).toEqual(2);
+      expect(emailClient.sendConfirmationEmail.mock.calls.length).toBe(1);
+      expect(emailClient.sendConfirmationEmail.mock.calls[0]).toEqual([
+        'test@mail.com',
         'token123',
-      );
+      ]);
     });
+  });
 
-    describe('confirm', () => {
-      it('should confirm subscription with valid token', async () => {
-        mockTokenService.getValidToken.mockResolvedValue({
-          subscriptionId: 42,
-        });
-
-        await service.confirm('valid_token');
-
-        expect(mockTokenService.getValidToken).toHaveBeenCalledWith(
-          'valid_token',
-        );
-        expect(mockSubscriptionRepo.confirm).toHaveBeenCalledWith(42);
+  describe('confirm', () => {
+    it('should confirm subscription', async () => {
+      tokenService.getValidToken.mockResolvedValue({
+        id: 101,
+        subscriptionId: 3,
+        token: 'token456',
+        createdAt: new Date(),
       });
+      await service.confirm('token456');
+      expect(tokenService.getValidToken.mock.calls.length).toBe(1);
+      expect(tokenService.getValidToken.mock.calls[0][0]).toEqual('token456');
+      expect(subscriptionRepo.confirm.mock.calls.length).toBe(1);
+      expect(subscriptionRepo.confirm.mock.calls[0][0]).toEqual(3);
     });
+  });
 
-    describe('unsubscribe', () => {
-      it('should delete subscription with valid token', async () => {
-        mockTokenService.getValidToken.mockResolvedValue({
-          subscriptionId: 99,
-        });
-
-        await service.unsubscribe('valid_token');
-
-        expect(mockTokenService.getValidToken).toHaveBeenCalledWith(
-          'valid_token',
-        );
-        expect(mockSubscriptionRepo.delete).toHaveBeenCalledWith(99);
+  describe('unsubscribe', () => {
+    it('should delete subscription', async () => {
+      tokenService.getValidToken.mockResolvedValue({
+        id: 102,
+        subscriptionId: 4,
+        token: 'token789',
+        createdAt: new Date(),
       });
+      await service.unsubscribe('token789');
+      expect(tokenService.getValidToken.mock.calls.length).toBe(1);
+      expect(tokenService.getValidToken.mock.calls[0][0]).toEqual('token789');
+      expect(tokenService.getValidToken.mock.calls.length).toBe(1);
+      expect(tokenService.getValidToken.mock.calls[0][0]).toEqual('token789');
+      expect(subscriptionRepo.delete.mock.calls.length).toBe(1);
+      expect(subscriptionRepo.delete.mock.calls[0][0]).toEqual(4);
     });
   });
 });

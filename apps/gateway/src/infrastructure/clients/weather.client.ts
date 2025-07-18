@@ -8,8 +8,13 @@ import {
   CityRequest,
   ValidateCityResponse,
 } from '../../../../../libs/proto/generated/weather';
-import { Weather } from 'apps/weather/src/domain/weather.entity';
 import { lastValueFrom } from 'rxjs';
+
+export interface Weather {
+  temperature: number;
+  humidity: number;
+  description: string;
+}
 
 @Injectable()
 export class WeatherGrpcClient implements OnModuleInit {
