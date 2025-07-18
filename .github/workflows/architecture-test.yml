@@ -17,6 +17,6 @@ jobs:
       - name: Run architecture tests via Docker Compose
         run: docker compose -f docker-compose.test.yml up --build --abort-on-container-exit gateway-architecture-test
 
-      - name: Clean up Docker Compose
+      - name: Clean up only gateway-architecture-test
         if: always()
-        run: docker compose -f docker-compose.test.yml down -v
+        run: docker compose -f docker-compose.test.yml rm -sf gateway-architecture-test
