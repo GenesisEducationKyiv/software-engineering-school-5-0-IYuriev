@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, Param, UsePipes } from '@nestjs/common';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { SubscriptionGrpcClient } from '../../infrastructure/clients/subscription.client';
-import { CityValidationPipe } from '../../infrastructure/pipes/city.validation.pipe';
+import { CityValidationPipe } from '../../common/pipes/city.validation.pipe';
 
 @Controller()
 export class SubscriptionController {

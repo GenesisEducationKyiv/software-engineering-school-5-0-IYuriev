@@ -1,5 +1,5 @@
 import { PipeTransform, Injectable } from '@nestjs/common';
-import { WeatherGrpcClient } from '../clients/weather.client';
+import { WeatherGrpcClient } from '../../infrastructure/clients/weather.client';
 import { CreateSubscriptionDto } from '../../presentation/subscription/dto/create-subscription.dto';
 import { GetWeatherDto } from '../../presentation/weather/dto/get-weather.dto';
 import { RpcException } from '@nestjs/microservices';

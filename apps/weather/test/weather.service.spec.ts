@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { WeatherService } from 'src/weather/application/weather.service';
-import { Weather } from 'src/weather/domain/weather.entity';
+import { WeatherService } from '../src/application/weather.service';
 import {
   WeatherClient,
   WeatherClientToken,
-} from 'src/weather/domain/weather.interface';
+} from '../src/domain/weather.interface';
+import { Weather } from '../src/domain/weather.entity';
 
 describe('WeatherService', () => {
   let service: WeatherService;

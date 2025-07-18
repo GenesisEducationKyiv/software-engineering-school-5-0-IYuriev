@@ -1,68 +1,26 @@
+version: '3.8'
+
 volumes:
   postgres-db-test:
   redis-data-test:
+  subscription-data-test:
+  weather-data-test:
+  email-data-test:
+  gateway-data:
 
 services:
-  node-unit-test:
-    container_name: node-unit-test
-    build:
-      dockerfile: Dockerfile.test
-    env_file:
-      - .env.test
-    depends_on:
-      - db-test
-      - redis-test
-    volumes:
-      - ./test:/home/node/app/test
-    command: npm run test
-
-  node-integration-test:
-    container_name: node-integration-test
-    build:
-      dockerfile: Dockerfile.test
-    env_file:
-      - .env.test
-    depends_on:
-      - db-test
-      - redis-test
-    volumes:
-      - ./test:/home/node/app/test
-      - ./jest.integration.config.js:/home/node/app/jest.integration.config.js
-    command: sh -c "npx prisma migrate deploy --schema ./prisma/schema.prisma && npm run test:integration"
-
-  node-e2e-test:
-    container_name: node-e2e-test
-    build:
-      dockerfile: Dockerfile.playwright
-    env_file:
-      - .env.test
-    depends_on:
-      db-test:
-        condition: service_healthy
-      redis-test:
-        condition: service_started
-      node-server:
-        condition: service_started
-      frontend:
-        condition: service_healthy
-    volumes:
-      - ./test:/home/node/app/test
-    command: sh -c "npx prisma migrate deploy --schema ./prisma/schema.prisma && npm run test:e2e"
-
   db-test:
-    container_name: db-test
     image: postgres:17-alpine
     restart: always
     shm_size: 128mb
-    env_file:
-      - .env.test
     environment:
-      - POSTGRES_DB=${POSTGRES_DB}
+      POSTGRES_DB: testdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
       - postgres-db-test:/var/lib/postgresql/data
     ports:
       - 5434:5432
-    user: postgres
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -d postgres']
       interval: 10s
@@ -70,7 +28,6 @@ services:
       retries: 5
 
   redis-test:
-    container_name: redis-test
     image: redis:7-alpine
     restart: always
     ports:
@@ -78,37 +35,140 @@ services:
     volumes:
       - redis-data-test:/data
 
-  node-server:
-    container_name: node-server
+  email-test:
     build:
       context: .
-      dockerfile: Dockerfile.test
+      dockerfile: apps/email/Dockerfile.test
     env_file:
       - .env.test
+    depends_on:
+      db-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_started
+    command: npm run test:email
+
+  gateway-integration-test:
+    build:
+      context: .
+      dockerfile: apps/gateway/Dockerfile.test
+    env_file:
+      - apps/gateway/.env.test
+    depends_on:
+      db-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_started
+      weather:
+        condition: service_started
+      subscription:
+        condition: service_started
+    command: npm run test:integration
+
+  gateway-architecture-test:
+    build:
+      context: .
+      dockerfile: apps/gateway/Dockerfile.test
+    env_file:
+      - .env.test
+    depends_on:
+      db-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_started
+    command: npm run test:architecture
+
+  notification-test:
+    build:
+      context: .
+      dockerfile: apps/notification/Dockerfile.test
+    env_file:
+      - .env.test
+    depends_on:
+      db-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_started
+    command: npm run test:notification
+
+  subscription-test:
+    build:
+      context: .
+      dockerfile: apps/subscription/Dockerfile.test
+    env_file:
+      - .env.test
+    depends_on:
+      db-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_started
+    command: npm run test:subscription
+
+  weather-test:
+    build:
+      context: .
+      dockerfile: apps/weather/Dockerfile.test
+    env_file:
+      - .env.test
+    depends_on:
+      db-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_started
+    command: npm run test:weather
+
+  weather:
+    container_name: weather
+    build:
+      context: .
+      dockerfile: apps/weather/Dockerfile
+    env_file:
+      - apps/weather/.env.test
     ports:
-      - 3000:3000
+      - 4001:4001
     depends_on:
       db-test:
         condition: service_healthy
       redis-test:
         condition: service_started
     volumes:
-      - ./src:/home/node/app/src
-    command: sh -c "npx prisma migrate deploy --schema ./prisma/schema.prisma && npm run start:dev"
+      - .:/app
+      - weather-data-test:/app/node_modules
 
-  frontend:
-    container_name: frontend
-    image: node:20-alpine
-    working_dir: /app
-    volumes:
-      - ./public:/app/public
-    command: sh -c "npm install -g serve && serve -s public -l 8080"
+  subscription:
+    container_name: subscription
+    build:
+      context: .
+      dockerfile: apps/subscription/Dockerfile
+    env_file:
+      - apps/subscription/.env.test
     ports:
-      - 8080:8080
+      - 4002:4002
     depends_on:
-      - node-server
-    healthcheck:
-      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:8080']
-      interval: 3s
-      timeout: 2s
-      retries: 10
+      db-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_started
+      email:
+        condition: service_started
+    volumes:
+      - .:/app
+      - subscription-data-test:/app/node_modules
+
+  email:
+    container_name: email
+    build:
+      context: .
+      dockerfile: apps/email/Dockerfile
+    env_file:
+      - apps/email/.env.test
+    ports:
+      - 4000:4000
+    depends_on:
+      db-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_started
+    volumes:
+      - .:/app
+      - email-data-test:/app/node_modules
