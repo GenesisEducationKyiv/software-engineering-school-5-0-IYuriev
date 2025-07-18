@@ -1,10 +1,15 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import {
+  SendConfirmationEmailRequest,
+  SendForecastEmailRequest,
+  SuccesResponse,
+} from './../../../../libs/proto/generated/email';
+import { Controller } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
-import { ConfirmationDto, ForecastDto } from './dto/create-email.dto';
 import {
   EmailProvider,
   EmailServiceToken,
 } from '../domain/email-service.interface';
+import { GrpcMethod } from '@nestjs/microservices';
 
 @Controller('email')
 export class EmailController {
@@ -13,19 +18,19 @@ export class EmailController {
     private readonly emailService: EmailProvider,
   ) {}
 
-  @Post('confirmation')
+  @GrpcMethod('EmailService', 'SendConfirmationEmail')
   async sendConfirmationEmail(
-    @Body() { email, token }: ConfirmationDto,
-  ): Promise<{ message: string }> {
-    await this.emailService.sendConfirmationEmail(email, token);
-    return { message: 'Confirmation email sent' };
+    data: SendConfirmationEmailRequest,
+  ): Promise<SuccesResponse> {
+    await this.emailService.sendConfirmationEmail(data.email, data.token);
+    return { success: true };
   }
 
-  @Post('forecast')
+  @GrpcMethod('EmailService', 'SendForecastEmail')
   async sendForecastEmail(
-    @Body() dto: ForecastDto,
-  ): Promise<{ message: string }> {
-    await this.emailService.sendForecastEmail(dto.payload);
-    return { message: 'Forecast email sent' };
+    data: SendForecastEmailRequest,
+  ): Promise<SuccesResponse> {
+    await this.emailService.sendForecastEmail(data);
+    return { success: true };
   }
 }

@@ -1,17 +1,22 @@
-import { Controller, Post, Body, Param, Get } from '@nestjs/common';
-import { Inject } from '@nestjs/common';
-import { SubscriptionDto } from './dto/subscription.dto';
+import { Controller, Inject } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
 import {
   SubscriptionRepo,
   SubscriptionRepositoryToken,
 } from '../application/subscription/interfaces/subscription-repoository.interface';
-import { Frequency } from '../../../subscription/src/domain/subscription/subscription.entity';
 import {
   SubscriptionProvider,
   SubscriptionServiceToken,
 } from '../../../subscription/src/domain/subscription/subscription-service.interface';
+import {
+  GetConfirmedSubscriptionsRequest,
+  SubscribeRequest,
+  SuccessResponse,
+  TokenRequest,
+} from '../../../../libs/proto/generated/subscription';
+import { mapGrpcFrequencyToPrisma } from '../infrastucture/mappers/frequency.mapper';
 
-@Controller('subscription')
+@Controller()
 export class SubscriptionApiController {
   constructor(
     @Inject(SubscriptionServiceToken)
@@ -20,26 +25,34 @@ export class SubscriptionApiController {
     private readonly subscriptionRepo: SubscriptionRepo,
   ) {}
 
-  @Post('subscribe')
-  async subscribe(@Body() dto: SubscriptionDto) {
-    await this.subscriptionService.subscribe(dto);
-    return true;
+  @GrpcMethod('SubscriptionService', 'Subscribe')
+  async subscribe(data: SubscribeRequest): Promise<SuccessResponse> {
+    const prismaFrequency = mapGrpcFrequencyToPrisma(data.frequency);
+    await this.subscriptionService.subscribe({
+      ...data,
+      frequency: prismaFrequency,
+    });
+    return { success: true };
   }
 
-  @Get('confirm/:token')
-  async confirm(@Param('token') token: string) {
-    await this.subscriptionService.confirm(token);
-    return true;
+  @GrpcMethod('SubscriptionService', 'Confirm')
+  async confirm(data: TokenRequest): Promise<SuccessResponse> {
+    console.log('Confirming subscription with token:', data.token);
+    await this.subscriptionService.confirm(data.token);
+    return { success: true };
   }
 
-  @Get('unsubscribe/:token')
-  async unsubscribe(@Param('token') token: string) {
-    await this.subscriptionService.unsubscribe(token);
-    return true;
+  @GrpcMethod('SubscriptionService', 'Unsubscribe')
+  async unsubscribe(data: TokenRequest): Promise<SuccessResponse> {
+    await this.subscriptionService.unsubscribe(data.token);
+    return { success: true };
   }
 
-  @Get('confirmed/:frequency')
-  async getConfirmedSubscriptions(@Param('frequency') frequency: Frequency) {
-    return this.subscriptionRepo.getConfirmedSubscriptions(frequency);
+  @GrpcMethod('SubscriptionService', 'GetConfirmedSubscriptions')
+  async getConfirmedSubscriptions(data: GetConfirmedSubscriptionsRequest) {
+    const prismaFrequency = mapGrpcFrequencyToPrisma(data.frequency);
+    const subscriptions =
+      await this.subscriptionRepo.getConfirmedSubscriptions(prismaFrequency);
+    return { subscriptions };
   }
 }

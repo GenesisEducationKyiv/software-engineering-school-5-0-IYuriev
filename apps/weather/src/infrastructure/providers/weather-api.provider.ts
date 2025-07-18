@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, HttpException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Weather } from '../../domain/weather.entity';
 import { WeatherProvider } from './weather-client.provider';
@@ -7,6 +7,7 @@ import { HttpClient } from '../../../../../libs/common/http/http.client';
 import { WeatherAPIData } from '../../../../../libs/constants/types/weather';
 import { WeatherApiEndpoint } from '../../../../../libs/constants/enums/weather';
 import { CityResponse } from '../../../../../libs/constants/types/city';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class WeatherApiProvider
@@ -35,9 +36,14 @@ export class WeatherApiProvider
   }
 
   async validateCity(city: string): Promise<string> {
-    const cities = await this.searchCity(city);
-    if (!cities?.length) throw new NotFoundException('City not found');
-    return cities[0].name;
+    try {
+      const cities = await this.searchCity(city);
+      if (!cities?.length) throw new RpcException('City not found');
+      return cities[0].name;
+    } catch (e) {
+      if (e instanceof HttpException) throw e;
+      throw new RpcException('Internal server error');
+    }
   }
 
   private async fetchWeather(city: string): Promise<WeatherAPIData> {

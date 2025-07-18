@@ -1,5 +1,5 @@
-import { NotFoundException } from '@nestjs/common';
 import { Weather } from '../../domain/weather.entity';
+import { RpcException } from '@nestjs/microservices';
 
 export abstract class WeatherProvider {
   private nextHandler: WeatherProvider;
@@ -16,7 +16,7 @@ export abstract class WeatherProvider {
       if (this.nextHandler) {
         return this.nextHandler.handle(city);
       }
-      throw new NotFoundException("Providers can't handle the request");
+      throw new RpcException("Providers can't handle the request");
     }
   }
 
@@ -27,7 +27,10 @@ export abstract class WeatherProvider {
       if (this.nextHandler) {
         return this.nextHandler.checkCity(city);
       }
-      throw new NotFoundException('City not found in any provider');
+      throw new RpcException({
+        code: 5,
+        message: 'City not found in any provider',
+      });
     }
   }
 

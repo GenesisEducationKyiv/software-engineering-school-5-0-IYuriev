@@ -1,8 +1,8 @@
-import { Observable } from 'rxjs';
 import {
-  GetWeatherResponse,
   ValidateCityResponse,
-} from '../../../../libs/proto/generated/weather';
+  GetWeatherResponse,
+} from '../../../../../libs/proto/generated/weather';
+import { Observable } from 'rxjs';
 
 export interface WeatherClient {
   getWeather(data: { city: string }): Observable<GetWeatherResponse>;

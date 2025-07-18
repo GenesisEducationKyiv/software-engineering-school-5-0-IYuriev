@@ -1,5 +1,4 @@
-import { Frequency } from '../../../../../subscription/src/domain/subscription/subscription.entity';
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateSubscriptionDto {
   @IsNotEmpty()
@@ -12,6 +11,5 @@ export class CreateSubscriptionDto {
   city: string;
 
   @IsNotEmpty()
-  @IsEnum(Frequency)
-  frequency: Frequency;
+  frequency: number;
 }

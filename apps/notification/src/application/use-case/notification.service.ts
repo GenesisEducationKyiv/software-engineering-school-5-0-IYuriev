@@ -4,19 +4,20 @@ import {
   NotificationRepo,
   NotificationRepositoryToken,
 } from '../interfaces/notification-repository.interface';
-import { Frequency } from '../../../../subscription/src/domain/subscription/subscription.entity';
 import { NotificationProvider } from '../../domain/notification-service.interface';
-import { SubscriptionHttpClient } from '../../infrastructure/clients/subscription-http.client';
+import { SubscriptionGrpcClient } from '../../infrastructure/clients/subscription.client';
+import { Frequency } from '../../../../../apps/subscription/src/domain/subscription/subscription.entity';
+import { mapPrismaFrequencyToGrpc } from '../../infrastructure/mappers/frequency.mapper';
 
 @Injectable()
 export class NotificationService implements NotificationProvider {
   constructor(
-    private readonly subscriptionClient: SubscriptionHttpClient,
+    private readonly subscriptionClient: SubscriptionGrpcClient,
     @Inject(NotificationRepositoryToken)
     private readonly notificationRepo: NotificationRepo,
   ) {}
 
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async notifyHourly(): Promise<void> {
     await this.notifySubscribers(Frequency.HOURLY);
   }
@@ -27,7 +28,11 @@ export class NotificationService implements NotificationProvider {
   }
 
   private async notifySubscribers(frequency: Frequency): Promise<void> {
-    const subscriptions = await this.subscriptionClient.confirmed(frequency);
+    const grpcFrequency = mapPrismaFrequencyToGrpc(frequency);
+    const subscriptions =
+      await this.subscriptionClient.getConfirmedSubscriptions({
+        frequency: grpcFrequency,
+      });
     for (const sub of subscriptions) {
       await this.notificationRepo.send(sub);
     }

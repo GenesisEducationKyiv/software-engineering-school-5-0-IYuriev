@@ -20,17 +20,12 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "libs/*": [
-        "../../libs/*"
-      ],
-      "src/*": [
-        "src/*"
-      ]
+      "libs/*": ["../../libs/*"],
+      "src/*": ["src/*"]
     }
   },
   "include": [
     "src/**/*",
-    "apps/weather-subscription-service/src/**/*",
     "libs/**/*",
     "apps/**/*",
     "public/**/*.js",

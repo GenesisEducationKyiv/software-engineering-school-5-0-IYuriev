@@ -9,6 +9,6 @@ async function bootstrap() {
 }
 
 bootstrap().catch((err) => {
-  console.error('Error during bootstrap in Email app:', err);
+  console.error('Error during bootstrap in Notification app:', err);
   process.exit(1);
 });

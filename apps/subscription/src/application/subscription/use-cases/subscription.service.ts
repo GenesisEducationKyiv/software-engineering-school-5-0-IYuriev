@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   SubscriptionPayload,
   SubscriptionProvider,
@@ -11,12 +11,13 @@ import {
   TokenProvider,
   TokenServiceToken,
 } from '../../../domain/token/token-service.interface';
-import { EmailHttpClient } from '../../../infrastucture/clients/email-http.client';
+import { EmailGrpcClient } from '../../../infrastucture/clients/email.client';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class SubscriptionService implements SubscriptionProvider {
   constructor(
-    private readonly emailClient: EmailHttpClient,
+    private readonly emailClient: EmailGrpcClient,
     @Inject(SubscriptionRepositoryToken)
     private readonly subscriptionRepo: SubscriptionRepo,
     @Inject(TokenServiceToken)
@@ -25,7 +26,9 @@ export class SubscriptionService implements SubscriptionProvider {
 
   async subscribe(payload: SubscriptionPayload): Promise<void> {
     const existing = await this.subscriptionRepo.findSubscription(payload);
-    if (existing) throw new ConflictException('Email already subscribed');
+    if (existing) {
+      throw new RpcException({ code: 6, message: 'Email already subscribed' });
+    }
 
     const subscription = await this.subscriptionRepo.create(payload);
     const token = await this.tokenService.createConfirmToken(subscription.id);

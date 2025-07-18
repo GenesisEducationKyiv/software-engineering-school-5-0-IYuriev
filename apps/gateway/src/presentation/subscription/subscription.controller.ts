@@ -1,11 +1,11 @@
 import { Controller, Post, Body, Get, Param, UsePipes } from '@nestjs/common';
-import { CityValidationPipe } from '../../../../../libs/common/pipes/city-validation.pipe';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
-import { SubscriptionHttpClient } from '../../infrastructure/clients/subscription-http.client';
+import { SubscriptionGrpcClient } from '../../infrastructure/clients/subscription.client';
+import { CityValidationPipe } from '../../infrastructure/pipes/city.validation.pipe';
 
 @Controller()
 export class SubscriptionController {
-  constructor(private readonly subscriptionService: SubscriptionHttpClient) {}
+  constructor(private readonly subscriptionService: SubscriptionGrpcClient) {}
 
   @UsePipes(CityValidationPipe)
   @Post('/subscribe')
@@ -16,13 +16,13 @@ export class SubscriptionController {
 
   @Get('confirm/:token')
   async confirm(@Param('token') token: string) {
-    await this.subscriptionService.confirm(token);
+    await this.subscriptionService.confirm({ token });
     return { message: 'Subscription confirmed successfully' };
   }
 
   @Get('unsubscribe/:token')
   async unsubscribe(@Param('token') token: string) {
-    await this.subscriptionService.unsubscribe(token);
+    await this.subscriptionService.unsubscribe({ token });
     return { message: 'Unsubscribed successfully' };
   }
 }

@@ -1,17 +1,24 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
 import { WeatherService } from '../application/weather.service';
+import {
+  CityRequest,
+  GetWeatherResponse,
+  ValidateCityResponse,
+} from '../../../../libs/proto/generated/weather';
 
-@Controller('weather')
+@Controller()
 export class WeatherApiController {
   constructor(private readonly weatherService: WeatherService) {}
 
-  @Get(':city')
-  async getWeather(@Param('city') city: string) {
-    return this.weatherService.getWeather(city);
+  @GrpcMethod('WeatherService', 'GetWeather')
+  async getWeather(data: CityRequest): Promise<GetWeatherResponse> {
+    return this.weatherService.getWeather(data.city);
   }
 
-  @Get('validate-city/:city')
-  async validateCity(@Param('city') city: string) {
-    return this.weatherService.validateCity(city);
+  @GrpcMethod('WeatherService', 'ValidateCity')
+  async validateCity(data: CityRequest): Promise<ValidateCityResponse> {
+    const city = await this.weatherService.validateCity(data.city);
+    return { city };
   }
 }

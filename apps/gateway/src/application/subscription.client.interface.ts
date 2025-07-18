@@ -1,7 +1,14 @@
-import { SubscriptionDto } from '../../../subscription/src/presentation/dto/subscription.dto';
+import {
+  SubscribeRequest,
+  SuccessResponse,
+  TokenRequest,
+} from '../../../../libs/proto/generated/subscription';
+import { Observable } from 'rxjs';
 
 export interface SubscriptionClient {
-  subscribe(payload: SubscriptionDto): Promise<void>;
-  confirm(token: string): Promise<void>;
-  unsubscribe(token: string): Promise<void>;
+  subscribe(payload: SubscribeRequest): Observable<SuccessResponse>;
+  confirm(data: TokenRequest): Observable<SuccessResponse>;
+  unsubscribe(data: TokenRequest): Observable<SuccessResponse>;
 }
+
+export const SUBSCRIPTION_PACKAGE = Symbol('SUBSCRIPTION_PACKAGE');

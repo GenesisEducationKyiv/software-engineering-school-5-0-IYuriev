@@ -1,10 +1,11 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WeatherProvider } from './weather-client.provider';
 import { CityValidatable, WeatherClient } from '../../domain/weather.interface';
 import { Weather } from '../../domain/weather.entity';
 import { HttpClient } from '../../../../../libs/common/http/http.client';
 import { OpenWeatherData } from '../../../../../libs/constants/types/weather';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class OpenWeatherProvider
@@ -36,11 +37,14 @@ export class OpenWeatherProvider
     try {
       const data = await this.fetchWeather(city);
       return data.name;
-    } catch (e) {
+    } catch (e: unknown) {
       if (e instanceof HttpException && e.getStatus() === 404) {
-        throw new NotFoundException('City not found');
+        throw new RpcException({ code: 5, message: 'City not found' });
       }
-      throw e;
+      throw new RpcException({
+        code: 13,
+        message: e instanceof Error ? e.message : 'Internal error',
+      });
     }
   }
 
