@@ -20,11 +20,14 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
+      "libs/*": ["../../libs/*"],
       "src/*": ["src/*"]
     }
   },
   "include": [
     "src/**/*",
+    "libs/**/*",
+    "apps/**/*",
     "public/**/*.js",
     "test",
     "test/**/*.ts",

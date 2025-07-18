@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package email;
+
+service EmailService {
+  rpc SendConfirmationEmail (SendConfirmationEmailRequest) returns (SuccesResponse);
+  rpc SendForecastEmail (SendForecastEmailRequest) returns (SuccesResponse);
+}
+
+message SendConfirmationEmailRequest {
+  string email = 1;
+  string token = 2;
+}
+
+message SendForecastEmailRequest {
+  string to = 1;
+  string subject = 2;
+  string text = 3;
+}
+
+message SuccesResponse {
+  bool success = 1;
+}
