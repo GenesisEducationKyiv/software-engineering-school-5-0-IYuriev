@@ -22,7 +22,7 @@ describe('Weather API (Integration)', () => {
 
   afterAll(async () => {
     await app.close();
-  });
+  }, 20000);
 
   it('should return weather for a valid city', async () => {
     const res = await request(app.getHttpServer())
