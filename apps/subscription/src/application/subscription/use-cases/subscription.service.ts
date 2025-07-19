@@ -1,30 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   SubscriptionPayload,
   SubscriptionProvider,
 } from '../../../domain/subscription/subscription-service.interface';
-import {
-  SubscriptionRepo,
-  SubscriptionRepositoryToken,
-} from '../interfaces/subscription-repoository.interface';
-import {
-  TokenProvider,
-  TokenServiceToken,
-} from '../../../domain/token/token-service.interface';
+import { SubscriptionRepo } from '../interfaces/subscription-repoository.interface';
+import { TokenProvider } from '../../../domain/token/token-service.interface';
 import { RpcException } from '@nestjs/microservices';
-import {
-  APP_EMAIL_CLIENT,
-  AppEmailClient,
-} from '../interfaces/email.client.interface';
+import { AppEmailClient } from '../interfaces/email.client.interface';
 
 @Injectable()
 export class SubscriptionService implements SubscriptionProvider {
   constructor(
-    @Inject(APP_EMAIL_CLIENT)
     private readonly emailClient: AppEmailClient,
-    @Inject(SubscriptionRepositoryToken)
     private readonly subscriptionRepo: SubscriptionRepo,
-    @Inject(TokenServiceToken)
     private readonly tokenService: TokenProvider,
   ) {}
 

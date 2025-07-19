@@ -1,8 +1,6 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { ClientGrpc } from '@nestjs/microservices';
+import { Inject, Injectable } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import {
-  SUBSCRIPTION_PACKAGE,
   GrpcSubscriptionClient,
   SubscriptionEntity,
   AppSubscriptionClient,
@@ -10,20 +8,11 @@ import {
 import { GetConfirmedSubscriptionsRequest } from '../../../../../libs/proto/generated/subscription';
 
 @Injectable()
-export class SubscriptionGrpcClient
-  implements OnModuleInit, AppSubscriptionClient
-{
-  private subscriptionService: GrpcSubscriptionClient;
-
+export class SubscriptionGrpcClient implements AppSubscriptionClient {
   constructor(
-    @Inject(SUBSCRIPTION_PACKAGE) private readonly client: ClientGrpc,
+    @Inject('SubscriptionService')
+    private readonly subscriptionService: GrpcSubscriptionClient,
   ) {}
-
-  onModuleInit() {
-    this.subscriptionService = this.client.getService<GrpcSubscriptionClient>(
-      'SubscriptionService',
-    );
-  }
 
   async getConfirmedSubscriptions(
     data: GetConfirmedSubscriptionsRequest,

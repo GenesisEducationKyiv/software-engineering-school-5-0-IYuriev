@@ -1,18 +1,14 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import {
   Frequency,
   NotificationSend,
-  NotificationSenderToken,
 } from '../interfaces/notification-sender.interface';
 import { NotificationProvider } from '../../domain/notification-service.interface';
 
 @Injectable()
 export class NotificationService implements NotificationProvider {
-  constructor(
-    @Inject(NotificationSenderToken)
-    private readonly notificationSender: NotificationSend,
-  ) {}
+  constructor(private readonly notificationSender: NotificationSend) {}
 
   @Cron(CronExpression.EVERY_HOUR)
   async notifyHourly(): Promise<void> {

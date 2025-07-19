@@ -1,8 +1,6 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { ClientGrpc } from '@nestjs/microservices';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   AppEmailClient,
-  EMAIL_PACKAGE,
   GrpcEmailClient,
 } from '../../application/subscription/interfaces/email.client.interface';
 import { lastValueFrom } from 'rxjs';
@@ -12,14 +10,11 @@ import {
 } from '../../../../../libs/proto/generated/email';
 
 @Injectable()
-export class EmailGrpcClient implements OnModuleInit, AppEmailClient {
-  private emailService: GrpcEmailClient;
-
-  constructor(@Inject(EMAIL_PACKAGE) private readonly client: ClientGrpc) {}
-
-  onModuleInit() {
-    this.emailService = this.client.getService<GrpcEmailClient>('EmailService');
-  }
+export class EmailGrpcClient implements AppEmailClient {
+  constructor(
+    @Inject('EmailService')
+    private readonly emailService: GrpcEmailClient,
+  ) {}
 
   async sendConfirmationEmail(
     data: SendConfirmationEmailRequest,

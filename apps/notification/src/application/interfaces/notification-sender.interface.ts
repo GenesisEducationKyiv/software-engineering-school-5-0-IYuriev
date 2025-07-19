@@ -5,9 +5,7 @@ export enum Frequency {
   DAILY = 'daily',
 }
 
-export interface NotificationSend {
-  send(sub: Subscription): Promise<void>;
-  sendByFrequency(frequency: Frequency): Promise<void>;
+export abstract class NotificationSend {
+  abstract send(sub: Subscription): Promise<void>;
+  abstract sendByFrequency(frequency: Frequency): Promise<void>;
 }
-
-export const NotificationSenderToken = Symbol('NotificationSender');

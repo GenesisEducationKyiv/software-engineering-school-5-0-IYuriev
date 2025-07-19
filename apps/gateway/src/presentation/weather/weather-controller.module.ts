@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { WeatherController } from './weather.controller';
 import { HttpModule } from '../../../../../libs/common/http/http.module';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ClientGrpc, ClientsModule, Transport } from '@nestjs/microservices';
 import {
-  APP_WEATHER_CLIENT,
+  AppWeatherClient,
+  GrpcWeatherClient,
   WEATHER_PACKAGE,
 } from '../../application/weather.client.interface';
 import { WeatherGrpcClient } from '../../infrastructure/clients/weather.client';
@@ -30,8 +31,14 @@ import { ConfigService } from '@nestjs/config';
   providers: [
     WeatherGrpcClient,
     {
-      provide: APP_WEATHER_CLIENT,
+      provide: AppWeatherClient,
       useExisting: WeatherGrpcClient,
+    },
+    {
+      provide: 'WeatherService',
+      useFactory: (client: ClientGrpc) =>
+        client.getService<GrpcWeatherClient>('WeatherService'),
+      inject: [WEATHER_PACKAGE],
     },
   ],
   controllers: [WeatherController],

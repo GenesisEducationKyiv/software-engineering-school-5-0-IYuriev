@@ -12,10 +12,8 @@ export interface GrpcEmailClient {
   ): Observable<SuccesResponse>;
 }
 
-export interface AppEmailClient {
-  sendConfirmationEmail(
+export abstract class AppEmailClient {
+  abstract sendConfirmationEmail(
     data: SendConfirmationEmailRequest,
   ): Promise<SuccesResponse>;
 }
-
-export const APP_EMAIL_CLIENT = Symbol('AppEmailClient');

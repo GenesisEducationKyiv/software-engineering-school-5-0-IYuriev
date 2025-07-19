@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ClientGrpc, ClientsModule, Transport } from '@nestjs/microservices';
 import {
-  APP_EMAIL_CLIENT,
+  AppEmailClient,
   EMAIL_PACKAGE,
 } from '../application/subscription/interfaces/email.client.interface';
 import { EmailGrpcClient } from './clients/email.client';
@@ -27,10 +27,16 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   ],
   providers: [
     {
-      provide: APP_EMAIL_CLIENT,
+      provide: AppEmailClient,
       useClass: EmailGrpcClient,
     },
+    {
+      provide: 'EmailService',
+      useFactory: (client: ClientGrpc) =>
+        client.getService<EmailGrpcClient>('EmailService'),
+      inject: [EMAIL_PACKAGE],
+    },
   ],
-  exports: [APP_EMAIL_CLIENT],
+  exports: [AppEmailClient],
 })
 export class SubscriptionModule {}

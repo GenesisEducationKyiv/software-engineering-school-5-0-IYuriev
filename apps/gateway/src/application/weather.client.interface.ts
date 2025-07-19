@@ -10,10 +10,8 @@ export interface GrpcWeatherClient {
   validateCity(data: CityRequest): Observable<ValidateCityResponse>;
 }
 
-export interface AppWeatherClient {
-  getWeather(data: CityRequest): Promise<GetWeatherResponse>;
-  validateCity(data: CityRequest): Promise<ValidateCityResponse>;
+export abstract class AppWeatherClient {
+  abstract getWeather(data: CityRequest): Promise<GetWeatherResponse>;
+  abstract validateCity(data: CityRequest): Promise<ValidateCityResponse>;
 }
-
-export const APP_WEATHER_CLIENT = Symbol('AppWeatherClient');
 export const WEATHER_PACKAGE = Symbol('WEATHER_PACKAGE');

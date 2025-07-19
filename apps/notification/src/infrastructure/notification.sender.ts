@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   Frequency,
@@ -6,18 +6,9 @@ import {
 } from '../application/interfaces/notification-sender.interface';
 import { SubscriptionEntity } from '../../../subscription/src/domain/subscription/subscription.entity';
 import { formatWeatherMessage } from '../../../../libs/utils/notification/notification.format';
-import {
-  APP_EMAIL_CLIENT,
-  AppEmailClient,
-} from '../application/interfaces/email.client.interface';
-import {
-  APP_WEATHER_CLIENT,
-  AppWeatherClient,
-} from '../application/interfaces/weather.client.interface';
-import {
-  APP_SUBSCRIPTION_CLIENT,
-  AppSubscriptionClient,
-} from '../application/interfaces/subscription.client.interface';
+import { AppEmailClient } from '../application/interfaces/email.client.interface';
+import { AppWeatherClient } from '../application/interfaces/weather.client.interface';
+import { AppSubscriptionClient } from '../application/interfaces/subscription.client.interface';
 import { mapPrismaFrequencyToGrpc } from './mappers/frequency.mapper';
 
 @Injectable()
@@ -26,11 +17,8 @@ export class NotificationSender implements NotificationSend {
 
   constructor(
     private readonly config: ConfigService,
-    @Inject(APP_EMAIL_CLIENT)
     private readonly emailService: AppEmailClient,
-    @Inject(APP_WEATHER_CLIENT)
     private readonly weatherService: AppWeatherClient,
-    @Inject(APP_SUBSCRIPTION_CLIENT)
     private readonly subscriptionClient: AppSubscriptionClient,
   ) {}
 

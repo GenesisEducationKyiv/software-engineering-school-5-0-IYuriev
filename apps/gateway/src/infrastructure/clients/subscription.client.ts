@@ -1,10 +1,8 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
-  SUBSCRIPTION_PACKAGE,
   GrpcSubscriptionClient,
   AppSubscriptionClient,
 } from '../../application/subscription.client.interface';
-import { ClientGrpc } from '@nestjs/microservices';
 import {
   SubscribeRequest,
   SuccessResponse,
@@ -13,20 +11,11 @@ import {
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
-export class SubscriptionGrpcClient
-  implements OnModuleInit, AppSubscriptionClient
-{
-  private subscriptionService: GrpcSubscriptionClient;
-
+export class SubscriptionGrpcClient implements AppSubscriptionClient {
   constructor(
-    @Inject(SUBSCRIPTION_PACKAGE) private readonly client: ClientGrpc,
+    @Inject('SubscriptionService')
+    private readonly subscriptionService: GrpcSubscriptionClient,
   ) {}
-
-  onModuleInit() {
-    this.subscriptionService = this.client.getService<GrpcSubscriptionClient>(
-      'SubscriptionService',
-    );
-  }
 
   async subscribe(data: SubscribeRequest): Promise<SuccessResponse> {
     await lastValueFrom(this.subscriptionService.subscribe(data));

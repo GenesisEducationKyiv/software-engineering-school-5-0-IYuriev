@@ -1,13 +1,7 @@
-import { Controller, Inject } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
-import {
-  SubscriptionRepo,
-  SubscriptionRepositoryToken,
-} from '../application/subscription/interfaces/subscription-repoository.interface';
-import {
-  SubscriptionProvider,
-  SubscriptionServiceToken,
-} from '../../../subscription/src/domain/subscription/subscription-service.interface';
+import { SubscriptionRepo } from '../application/subscription/interfaces/subscription-repoository.interface';
+import { SubscriptionProvider } from '../../../subscription/src/domain/subscription/subscription-service.interface';
 import {
   GetConfirmedSubscriptionsRequest,
   SubscribeRequest,
@@ -19,9 +13,7 @@ import { mapGrpcFrequencyToPrisma } from '../infrastucture/mappers/frequency.map
 @Controller()
 export class SubscriptionApiController {
   constructor(
-    @Inject(SubscriptionServiceToken)
     private readonly subscriptionService: SubscriptionProvider,
-    @Inject(SubscriptionRepositoryToken)
     private readonly subscriptionRepo: SubscriptionRepo,
   ) {}
 

@@ -3,14 +3,16 @@ import { SubscriptionController } from './subscription.controller';
 import { HttpModule } from '../../../../../libs/common/http/http.module';
 import { SubscriptionGrpcClient } from '../../infrastructure/clients/subscription.client';
 import { WeatherGrpcClient } from '../../infrastructure/clients/weather.client';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ClientGrpc, ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import {
-  APP_SUBSCRIPTION_CLIENT,
+  AppSubscriptionClient,
+  GrpcSubscriptionClient,
   SUBSCRIPTION_PACKAGE,
 } from '../../application/subscription.client.interface';
 import {
-  APP_WEATHER_CLIENT,
+  AppWeatherClient,
+  GrpcWeatherClient,
   WEATHER_PACKAGE,
 } from '../../application/weather.client.interface';
 
@@ -47,12 +49,24 @@ import {
   providers: [
     WeatherGrpcClient,
     {
-      provide: APP_WEATHER_CLIENT,
+      provide: AppWeatherClient,
       useExisting: WeatherGrpcClient,
     },
     {
-      provide: APP_SUBSCRIPTION_CLIENT,
+      provide: AppSubscriptionClient,
       useClass: SubscriptionGrpcClient,
+    },
+    {
+      provide: 'WeatherService',
+      useFactory: (client: ClientGrpc) =>
+        client.getService<GrpcWeatherClient>('WeatherService'),
+      inject: [WEATHER_PACKAGE],
+    },
+    {
+      provide: 'SubscriptionService',
+      useFactory: (client: ClientGrpc) =>
+        client.getService<GrpcSubscriptionClient>('SubscriptionService'),
+      inject: [SUBSCRIPTION_PACKAGE],
     },
   ],
   controllers: [SubscriptionController],

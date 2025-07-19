@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { TokenService } from '../../application/token/use-cases/token.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { TokenRepository } from './token.repository';
-import { TokenRepositoryToken } from '../../application/token/interfaces/token-repository.interface';
-import { TokenServiceToken } from '../../../../subscription/src/domain/token/token-service.interface';
+import { TokenRepo } from '../../application/token/interfaces/token-repository.interface';
+import { TokenProvider } from '../../../../subscription/src/domain/token/token-service.interface';
 
 @Module({
   providers: [
@@ -11,14 +11,14 @@ import { TokenServiceToken } from '../../../../subscription/src/domain/token/tok
     PrismaService,
     TokenRepository,
     {
-      provide: TokenRepositoryToken,
+      provide: TokenRepo,
       useExisting: TokenRepository,
     },
     {
-      provide: TokenServiceToken,
+      provide: TokenProvider,
       useExisting: TokenService,
     },
   ],
-  exports: [TokenServiceToken, TokenRepositoryToken],
+  exports: [TokenRepo, TokenProvider],
 })
 export class TokenModule {}

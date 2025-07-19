@@ -8,8 +8,6 @@ export interface EmailServiceGrpc {
   sendForecastEmail(payload: EmailPayload): Observable<SuccesResponse>;
 }
 
-export interface AppEmailClient {
-  sendForecastEmail(payload: EmailPayload): Promise<SuccesResponse>;
+export abstract class AppEmailClient {
+  abstract sendForecastEmail(payload: EmailPayload): Promise<SuccesResponse>;
 }
-
-export const APP_EMAIL_CLIENT = Symbol('AppEmailClient');

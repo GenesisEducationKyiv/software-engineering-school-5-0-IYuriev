@@ -4,16 +4,14 @@ import {
   SubscriptionEntity,
 } from '../../../domain/subscription/subscription.entity';
 
-export interface SubscriptionRepo {
-  getConfirmedSubscriptions(
+export abstract class SubscriptionRepo {
+  abstract getConfirmedSubscriptions(
     frequency: Frequency,
   ): Promise<SubscriptionEntity[]>;
-  findSubscription(
+  abstract findSubscription(
     payload: SubscriptionPayload,
   ): Promise<SubscriptionEntity | null>;
-  create(payload: SubscriptionPayload): Promise<SubscriptionEntity>;
-  confirm(id: number): Promise<void>;
-  delete(id: number): Promise<void>;
+  abstract create(payload: SubscriptionPayload): Promise<SubscriptionEntity>;
+  abstract confirm(id: number): Promise<void>;
+  abstract delete(id: number): Promise<void>;
 }
-
-export const SubscriptionRepositoryToken = Symbol('SubscriptionRepository');

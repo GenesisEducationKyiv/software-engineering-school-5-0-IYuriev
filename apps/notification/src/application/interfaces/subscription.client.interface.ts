@@ -26,11 +26,10 @@ export interface GrpcSubscriptionClient {
   ): Observable<SubscriptionEntity[]>;
 }
 
-export interface AppSubscriptionClient {
-  getConfirmedSubscriptions(
+export abstract class AppSubscriptionClient {
+  abstract getConfirmedSubscriptions(
     data: GetConfirmedSubscriptionsRequest,
   ): Promise<SubscriptionEntity[]>;
 }
 
-export const APP_SUBSCRIPTION_CLIENT = Symbol('AppSubscriptionClient');
 export const SUBSCRIPTION_PACKAGE = Symbol('SUBSCRIPTION_PACKAGE');
