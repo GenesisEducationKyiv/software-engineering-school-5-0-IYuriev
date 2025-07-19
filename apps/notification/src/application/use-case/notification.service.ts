@@ -21,7 +21,7 @@ export class NotificationService implements NotificationProvider {
     private readonly notificationRepo: NotificationRepo,
   ) {}
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_HOUR)
   async notifyHourly(): Promise<void> {
     await this.notifySubscribers(Frequency.HOURLY);
   }
