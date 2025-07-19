@@ -3,7 +3,7 @@ import {
   Frequency,
   NotificationService,
 } from '../src/application/use-case/notification.service';
-import { NotificationRepositoryToken } from '../src/application/interfaces/notification-repository.interface';
+import { NotificationSenderToken } from '../src/application/interfaces/notification-repository.interface';
 import { SubscriptionGrpcClient } from '../src/infrastructure/clients/subscription.client';
 
 describe('NotificationService', () => {
@@ -25,7 +25,7 @@ describe('NotificationService', () => {
           useValue: mockSubscriptionClient,
         },
         {
-          provide: NotificationRepositoryToken,
+          provide: NotificationSenderToken,
           useValue: mockNotificationRepo,
         },
       ],

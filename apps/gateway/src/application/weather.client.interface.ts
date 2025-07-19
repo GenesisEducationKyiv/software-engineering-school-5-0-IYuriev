@@ -15,4 +15,5 @@ export interface AppWeatherClient {
   validateCity(data: CityRequest): Promise<ValidateCityResponse>;
 }
 
+export const APP_WEATHER_CLIENT = Symbol('AppWeatherClient');
 export const WEATHER_PACKAGE = Symbol('WEATHER_PACKAGE');

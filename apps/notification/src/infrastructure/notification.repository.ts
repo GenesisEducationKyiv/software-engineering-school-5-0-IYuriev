@@ -1,19 +1,37 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NotificationRepo } from '../../../notification/src/application/interfaces/notification-repository.interface';
-import { EmailGrpcClient } from './clients/email.client';
+import {
+  Frequency,
+  NotificationSend,
+} from '../../../notification/src/application/interfaces/notification-repository.interface';
 import { SubscriptionEntity } from '../../../subscription/src/domain/subscription/subscription.entity';
 import { formatWeatherMessage } from '../../../../libs/utils/notification/notification.format';
-import { WeatherGrpcClient } from './clients/weather.client';
+import {
+  APP_EMAIL_CLIENT,
+  AppEmailClient,
+} from '../application/interfaces/email.client.interface';
+import {
+  APP_WEATHER_CLIENT,
+  AppWeatherClient,
+} from '../application/interfaces/weather.client.interface';
+import {
+  APP_SUBSCRIPTION_CLIENT,
+  AppSubscriptionClient,
+} from '../application/interfaces/subscription.client.interface';
+import { mapPrismaFrequencyToGrpc } from './mappers/frequency.mapper';
 
 @Injectable()
-export class NotificationRepository implements NotificationRepo {
+export class NotificationSender implements NotificationSend {
   private readonly unsubscribeUrl = this.config.get<string>('UNSUBSCRIBE_URL');
 
   constructor(
-    private readonly emailService: EmailGrpcClient,
-    private readonly weatherService: WeatherGrpcClient,
     private readonly config: ConfigService,
+    @Inject(APP_EMAIL_CLIENT)
+    private readonly emailService: AppEmailClient,
+    @Inject(APP_WEATHER_CLIENT)
+    private readonly weatherService: AppWeatherClient,
+    @Inject(APP_SUBSCRIPTION_CLIENT)
+    private readonly subscriptionClient: AppSubscriptionClient,
   ) {}
 
   async send(sub: SubscriptionEntity): Promise<void> {
@@ -26,5 +44,16 @@ export class NotificationRepository implements NotificationRepo {
       subject: sub.city,
       text: message,
     });
+  }
+
+  async sendByFrequency(frequency: Frequency): Promise<void> {
+    const grpcFrequency = mapPrismaFrequencyToGrpc(frequency);
+    const subscriptions =
+      await this.subscriptionClient.getConfirmedSubscriptions({
+        frequency: grpcFrequency,
+      });
+    for (const sub of subscriptions) {
+      await this.send(sub);
+    }
   }
 }

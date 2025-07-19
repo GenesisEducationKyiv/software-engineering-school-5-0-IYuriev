@@ -1,14 +1,18 @@
-import { Controller, Get, Query, UsePipes } from '@nestjs/common';
+import { Controller, Get, Inject, Query, UsePipes } from '@nestjs/common';
 import { GetWeatherDto } from './dto/get-weather.dto';
-import {
-  Weather,
-  WeatherGrpcClient,
-} from '../../infrastructure/clients/weather.client';
+import { Weather } from '../../infrastructure/clients/weather.client';
 import { CityValidationPipe } from '../../common/pipes/city.validation.pipe';
+import {
+  APP_WEATHER_CLIENT,
+  AppWeatherClient,
+} from '../../application/weather.client.interface';
 
 @Controller('weather')
 export class WeatherController {
-  constructor(private readonly weatherService: WeatherGrpcClient) {}
+  constructor(
+    @Inject(APP_WEATHER_CLIENT)
+    private readonly weatherService: AppWeatherClient,
+  ) {}
 
   @UsePipes(CityValidationPipe)
   @Get()

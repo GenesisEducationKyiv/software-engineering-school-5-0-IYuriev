@@ -4,8 +4,14 @@ import { HttpModule } from '../../../../../libs/common/http/http.module';
 import { SubscriptionGrpcClient } from '../../infrastructure/clients/subscription.client';
 import { WeatherGrpcClient } from '../../infrastructure/clients/weather.client';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { SUBSCRIPTION_PACKAGE } from '../../application/subscription.client.interface';
-import { WEATHER_PACKAGE } from '../../application/weather.client.interface';
+import {
+  APP_SUBSCRIPTION_CLIENT,
+  SUBSCRIPTION_PACKAGE,
+} from '../../application/subscription.client.interface';
+import {
+  APP_WEATHER_CLIENT,
+  WEATHER_PACKAGE,
+} from '../../application/weather.client.interface';
 
 @Module({
   imports: [
@@ -31,7 +37,17 @@ import { WEATHER_PACKAGE } from '../../application/weather.client.interface';
       },
     ]),
   ],
-  providers: [SubscriptionGrpcClient, WeatherGrpcClient],
+  providers: [
+    WeatherGrpcClient,
+    {
+      provide: APP_WEATHER_CLIENT,
+      useExisting: WeatherGrpcClient,
+    },
+    {
+      provide: APP_SUBSCRIPTION_CLIENT,
+      useClass: SubscriptionGrpcClient,
+    },
+  ],
   controllers: [SubscriptionController],
 })
 export class SubscriptionControllerModule {}

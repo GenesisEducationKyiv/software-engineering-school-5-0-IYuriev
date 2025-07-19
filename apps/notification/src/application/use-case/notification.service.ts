@@ -1,24 +1,17 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import {
-  NotificationRepo,
-  NotificationRepositoryToken,
+  Frequency,
+  NotificationSend,
+  NotificationSenderToken,
 } from '../interfaces/notification-repository.interface';
 import { NotificationProvider } from '../../domain/notification-service.interface';
-import { SubscriptionGrpcClient } from '../../infrastructure/clients/subscription.client';
-import { mapPrismaFrequencyToGrpc } from '../../infrastructure/mappers/frequency.mapper';
-
-export enum Frequency {
-  HOURLY = 'hourly',
-  DAILY = 'daily',
-}
 
 @Injectable()
 export class NotificationService implements NotificationProvider {
   constructor(
-    private readonly subscriptionClient: SubscriptionGrpcClient,
-    @Inject(NotificationRepositoryToken)
-    private readonly notificationRepo: NotificationRepo,
+    @Inject(NotificationSenderToken)
+    private readonly notificationSender: NotificationSend,
   ) {}
 
   @Cron(CronExpression.EVERY_HOUR)
@@ -32,13 +25,6 @@ export class NotificationService implements NotificationProvider {
   }
 
   private async notifySubscribers(frequency: Frequency): Promise<void> {
-    const grpcFrequency = mapPrismaFrequencyToGrpc(frequency);
-    const subscriptions =
-      await this.subscriptionClient.getConfirmedSubscriptions({
-        frequency: grpcFrequency,
-      });
-    for (const sub of subscriptions) {
-      await this.notificationRepo.send(sub);
-    }
+    await this.notificationSender.sendByFrequency(frequency);
   }
 }

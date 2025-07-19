@@ -1,6 +1,6 @@
 import { GetConfirmedSubscriptionsRequest } from '../../../../../libs/proto/generated/subscription';
 import { Observable } from 'rxjs';
-import { Frequency } from '../use-case/notification.service';
+import { Frequency } from './notification-repository.interface';
 
 export interface SubscriptionEntity {
   id: number;
@@ -20,10 +20,17 @@ export interface TokenEntity {
   createdAt: Date;
 }
 
-export interface SubscriptionClient {
+export interface GrpcSubscriptionClient {
   getConfirmedSubscriptions(
     data: GetConfirmedSubscriptionsRequest,
   ): Observable<SubscriptionEntity[]>;
 }
 
+export interface AppSubscriptionClient {
+  getConfirmedSubscriptions(
+    data: GetConfirmedSubscriptionsRequest,
+  ): Promise<SubscriptionEntity[]>;
+}
+
+export const APP_SUBSCRIPTION_CLIENT = Symbol('AppSubscriptionClient');
 export const SUBSCRIPTION_PACKAGE = Symbol('SUBSCRIPTION_PACKAGE');

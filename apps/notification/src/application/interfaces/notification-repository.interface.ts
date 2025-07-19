@@ -1,7 +1,13 @@
 import { Subscription } from '../../../../../libs/constants/types/subscription';
 
-export interface NotificationRepo {
-  send(sub: Subscription): Promise<void>;
+export enum Frequency {
+  HOURLY = 'hourly',
+  DAILY = 'daily',
 }
 
-export const NotificationRepositoryToken = Symbol('NotificationRepository');
+export interface NotificationSend {
+  send(sub: Subscription): Promise<void>;
+  sendByFrequency(frequency: Frequency): Promise<void>;
+}
+
+export const NotificationSenderToken = Symbol('NotificationSender');

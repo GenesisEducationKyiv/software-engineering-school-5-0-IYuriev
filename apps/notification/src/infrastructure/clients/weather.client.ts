@@ -2,17 +2,18 @@ import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import {
   CityRequest,
+  GetWeatherResponse,
   ValidateCityResponse,
 } from '../../../../../libs/proto/generated/weather';
-import { Weather } from 'apps/weather/src/domain/weather.entity';
 import { lastValueFrom } from 'rxjs';
 import {
+  AppWeatherClient,
   WEATHER_PACKAGE,
   WeatherClient,
 } from '../../application/interfaces/weather.client.interface';
 
 @Injectable()
-export class WeatherGrpcClient implements OnModuleInit {
+export class WeatherGrpcClient implements OnModuleInit, AppWeatherClient {
   private weatherService: WeatherClient;
 
   constructor(@Inject(WEATHER_PACKAGE) private readonly client: ClientGrpc) {}
@@ -22,7 +23,7 @@ export class WeatherGrpcClient implements OnModuleInit {
       this.client.getService<WeatherClient>('WeatherService');
   }
 
-  async getWeather(data: CityRequest): Promise<Weather> {
+  async getWeather(data: CityRequest): Promise<GetWeatherResponse> {
     return await lastValueFrom(
       this.weatherService.getWeather({ city: data.city }),
     );

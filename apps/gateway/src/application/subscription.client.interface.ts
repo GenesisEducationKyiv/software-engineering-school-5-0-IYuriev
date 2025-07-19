@@ -17,4 +17,5 @@ export interface AppSubscriptionClient {
   unsubscribe(data: TokenRequest): Promise<SuccessResponse>;
 }
 
+export const APP_SUBSCRIPTION_CLIENT = Symbol('AppSubscriptionClient');
 export const SUBSCRIPTION_PACKAGE = Symbol('SUBSCRIPTION_PACKAGE');

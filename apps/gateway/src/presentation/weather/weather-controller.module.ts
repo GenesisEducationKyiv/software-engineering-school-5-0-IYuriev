@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { WeatherController } from './weather.controller';
 import { HttpModule } from '../../../../../libs/common/http/http.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { WEATHER_PACKAGE } from '../../application/weather.client.interface';
+import {
+  APP_WEATHER_CLIENT,
+  WEATHER_PACKAGE,
+} from '../../application/weather.client.interface';
 import { WeatherGrpcClient } from '../../infrastructure/clients/weather.client';
 
 @Module({
@@ -20,7 +23,13 @@ import { WeatherGrpcClient } from '../../infrastructure/clients/weather.client';
       },
     ]),
   ],
-  providers: [WeatherGrpcClient],
+  providers: [
+    WeatherGrpcClient,
+    {
+      provide: APP_WEATHER_CLIENT,
+      useExisting: WeatherGrpcClient,
+    },
+  ],
   controllers: [WeatherController],
 })
 export class WeatherControllerModule {}

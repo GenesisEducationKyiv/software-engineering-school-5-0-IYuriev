@@ -11,13 +11,17 @@ import {
   TokenProvider,
   TokenServiceToken,
 } from '../../../domain/token/token-service.interface';
-import { EmailGrpcClient } from '../../../infrastucture/clients/email.client';
 import { RpcException } from '@nestjs/microservices';
+import {
+  APP_EMAIL_CLIENT,
+  AppEmailClient,
+} from '../interfaces/email.client.interface';
 
 @Injectable()
 export class SubscriptionService implements SubscriptionProvider {
   constructor(
-    private readonly emailClient: EmailGrpcClient,
+    @Inject(APP_EMAIL_CLIENT)
+    private readonly emailClient: AppEmailClient,
     @Inject(SubscriptionRepositoryToken)
     private readonly subscriptionRepo: SubscriptionRepo,
     @Inject(TokenServiceToken)
@@ -29,10 +33,10 @@ export class SubscriptionService implements SubscriptionProvider {
     if (existing) {
       throw new RpcException({ code: 6, message: 'Email already subscribed' });
     }
-
+    const { email } = payload;
     const subscription = await this.subscriptionRepo.create(payload);
     const token = await this.tokenService.createConfirmToken(subscription.id);
-    await this.emailClient.sendConfirmationEmail(payload.email, token);
+    await this.emailClient.sendConfirmationEmail({ email, token });
   }
 
   async confirm(token: string): Promise<void> {
