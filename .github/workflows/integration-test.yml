@@ -25,9 +25,9 @@ jobs:
 
       - name: Create .env.test for gateway
         run: echo "${{ secrets.TEST_GATEWAY_ENV_FILE }}" > apps/gateway/.env.test
-      
-      - name: Build weather and email images
-        run: docker compose -f docker-compose.test.yml build weather email
+
+      - name: Build required images
+        run: docker compose -f docker-compose.test.yml build weather email subscription
 
       - name: Run all integration tests via Docker Compose
         run: docker compose -f docker-compose.test.yml up --build --abort-on-container-exit gateway-integration-test
