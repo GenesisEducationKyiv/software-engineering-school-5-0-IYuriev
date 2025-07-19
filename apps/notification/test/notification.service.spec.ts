@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationService } from '../src/application/use-case/notification.service';
 import {
   Frequency,
-  NotificationSenderToken,
+  NotificationSend,
 } from '../src/application/interfaces/notification-sender.interface';
-import { APP_SUBSCRIPTION_CLIENT } from '../src/application/interfaces/subscription.client.interface';
+import { AppSubscriptionClient } from '../src/application/interfaces/subscription.client.interface';
 
 describe('NotificationService', () => {
   let service: NotificationService;
@@ -22,11 +22,11 @@ describe('NotificationService', () => {
       providers: [
         NotificationService,
         {
-          provide: APP_SUBSCRIPTION_CLIENT,
+          provide: AppSubscriptionClient,
           useValue: mockSubscriptionClient,
         },
         {
-          provide: NotificationSenderToken,
+          provide: NotificationSend,
           useValue: mockNotificationSender,
         },
       ],
