@@ -15,41 +15,50 @@ import {
   SUBSCRIPTION_PACKAGE,
 } from '../application/interfaces/subscription.client.interface';
 import { SubscriptionGrpcClient } from './clients/subscription.client';
-import { NotificationSenderToken } from '../application/interfaces/notification-repository.interface';
-import { NotificationSender } from './notification.repository';
-import { ConfigModule } from '@nestjs/config';
+import { NotificationSenderToken } from '../application/interfaces/notification-sender.interface';
+import { NotificationSender } from './notification.sender';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NotificationService } from '../application/use-case/notification.service';
 
 @Module({
   imports: [
     ConfigModule,
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: EMAIL_PACKAGE,
-        transport: Transport.GRPC,
-        options: {
-          package: 'email',
-          protoPath: 'libs/proto/src/email.proto',
-          url: 'email:4000',
-        },
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: 'email',
+            protoPath: 'libs/proto/src/email.proto',
+            url: config.get<string>('EMAIL_GRPC_URL'),
+          },
+        }),
+        inject: [ConfigService],
       },
       {
         name: WEATHER_PACKAGE,
-        transport: Transport.GRPC,
-        options: {
-          package: 'weather',
-          protoPath: 'libs/proto/src/weather.proto',
-          url: 'weather:4001',
-        },
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: 'weather',
+            protoPath: 'libs/proto/src/weather.proto',
+            url: config.get<string>('WEATHER_GRPC_URL'),
+          },
+        }),
+        inject: [ConfigService],
       },
       {
         name: SUBSCRIPTION_PACKAGE,
-        transport: Transport.GRPC,
-        options: {
-          package: 'subscription',
-          protoPath: 'libs/proto/src/subscription.proto',
-          url: 'subscription:4002',
-        },
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: 'subscription',
+            protoPath: 'libs/proto/src/subscription.proto',
+            url: config.get<string>('SUBSCRIPTION_GRPC_URL'),
+          },
+        }),
+        inject: [ConfigService],
       },
     ]),
   ],

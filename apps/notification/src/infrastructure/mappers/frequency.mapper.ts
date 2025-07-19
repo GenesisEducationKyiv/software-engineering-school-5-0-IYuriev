@@ -1,4 +1,4 @@
-import { Frequency } from '../../application/use-case/notification.service';
+import { Frequency } from '../../application/interfaces/notification-sender.interface';
 
 export function mapPrismaFrequencyToGrpc(frequency: Frequency): number {
   switch (frequency) {

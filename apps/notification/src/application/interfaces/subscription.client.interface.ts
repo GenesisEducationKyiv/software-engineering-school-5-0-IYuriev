@@ -1,6 +1,6 @@
 import { GetConfirmedSubscriptionsRequest } from '../../../../../libs/proto/generated/subscription';
 import { Observable } from 'rxjs';
-import { Frequency } from './notification-repository.interface';
+import { Frequency } from './notification-sender.interface';
 
 export interface SubscriptionEntity {
   id: number;

@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import {
   Frequency,
   NotificationSend,
-} from '../../../notification/src/application/interfaces/notification-repository.interface';
+} from '../application/interfaces/notification-sender.interface';
 import { SubscriptionEntity } from '../../../subscription/src/domain/subscription/subscription.entity';
 import { formatWeatherMessage } from '../../../../libs/utils/notification/notification.format';
 import {

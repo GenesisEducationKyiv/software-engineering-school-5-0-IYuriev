@@ -8,9 +8,11 @@ import { LoggingMiddleware } from '../../../libs/common/middlewares/logger.middl
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { SubscriptionControllerModule } from './presentation/subscription/subscription-controller.module';
 import { WeatherControllerModule } from './presentation/weather/weather-controller.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     SubscriptionControllerModule,
     WeatherControllerModule,
     PrometheusModule.register({

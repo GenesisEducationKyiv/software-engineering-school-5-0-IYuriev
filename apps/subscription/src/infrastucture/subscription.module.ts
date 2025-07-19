@@ -5,18 +5,23 @@ import {
   EMAIL_PACKAGE,
 } from '../application/subscription/interfaces/email.client.interface';
 import { EmailGrpcClient } from './clients/email.client';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    ClientsModule.register([
+    ConfigModule,
+    ClientsModule.registerAsync([
       {
         name: EMAIL_PACKAGE,
-        transport: Transport.GRPC,
-        options: {
-          package: 'email',
-          protoPath: 'libs/proto/src/email.proto',
-          url: 'email:4000',
-        },
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: 'email',
+            protoPath: 'libs/proto/src/email.proto',
+            url: config.get<string>('EMAIL_GRPC_URL'),
+          },
+        }),
+        inject: [ConfigService],
       },
     ]),
   ],

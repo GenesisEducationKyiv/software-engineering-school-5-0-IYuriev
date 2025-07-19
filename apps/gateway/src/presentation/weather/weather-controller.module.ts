@@ -7,19 +7,23 @@ import {
   WEATHER_PACKAGE,
 } from '../../application/weather.client.interface';
 import { WeatherGrpcClient } from '../../infrastructure/clients/weather.client';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     HttpModule,
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: WEATHER_PACKAGE,
-        transport: Transport.GRPC,
-        options: {
-          package: 'weather',
-          protoPath: 'libs/proto/src/weather.proto',
-          url: 'weather:4001',
-        },
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: 'weather',
+            protoPath: 'libs/proto/src/weather.proto',
+            url: config.get<string>('WEATHER_GRPC_URL'),
+          },
+        }),
+        inject: [ConfigService],
       },
     ]),
   ],

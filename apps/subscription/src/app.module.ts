@@ -8,9 +8,15 @@ import { SubscriptionRepository } from './infrastucture/subscription/subscriptio
 import { PrismaService } from './infrastucture/prisma/prisma.service';
 import { SubscriptionRepositoryToken } from './application/subscription/interfaces/subscription-repoository.interface';
 import { SubscriptionModule } from './infrastucture/subscription.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [TokenModule, HttpModule, SubscriptionModule],
+  imports: [
+    TokenModule,
+    HttpModule,
+    SubscriptionModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+  ],
   controllers: [SubscriptionApiController],
   providers: [
     SubscriptionService,

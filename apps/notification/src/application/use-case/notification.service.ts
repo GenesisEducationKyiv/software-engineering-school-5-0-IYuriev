@@ -4,7 +4,7 @@ import {
   Frequency,
   NotificationSend,
   NotificationSenderToken,
-} from '../interfaces/notification-repository.interface';
+} from '../interfaces/notification-sender.interface';
 import { NotificationProvider } from '../../domain/notification-service.interface';
 
 @Injectable()

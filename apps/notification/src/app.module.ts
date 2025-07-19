@@ -7,7 +7,7 @@ import { NotificationModule } from './infrastructure/notification.module';
 @Module({
   imports: [
     HttpModule,
-    ConfigModule,
+    ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
     NotificationModule,
   ],

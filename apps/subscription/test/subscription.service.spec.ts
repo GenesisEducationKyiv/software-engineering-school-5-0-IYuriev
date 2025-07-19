@@ -73,10 +73,10 @@ describe('SubscriptionService', () => {
       expect(tokenService.createConfirmToken.mock.calls.length).toBe(1);
       expect(tokenService.createConfirmToken.mock.calls[0][0]).toEqual(2);
       expect(emailClient.sendConfirmationEmail.mock.calls.length).toBe(1);
-      expect(emailClient.sendConfirmationEmail.mock.calls[0]).toEqual([
-        'test@mail.com',
-        'token123',
-      ]);
+      expect(emailClient.sendConfirmationEmail.mock.calls[0][0]).toEqual({
+        email: 'test@mail.com',
+        token: 'token123',
+      });
     });
   });
 
