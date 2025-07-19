@@ -29,6 +29,22 @@ jobs:
       - name: Build required images
         run: docker compose -f docker-compose.test.yml build weather email subscription
 
+      - name: Wait for weather service healthcheck
+        run: |
+          for i in {1..30}; do
+            STATUS=$(docker compose -f docker-compose.test.yml ps | grep weather | grep healthy)
+            if [ ! -z "$STATUS" ]; then
+              echo "Weather service is healthy"
+              break
+            fi
+            echo "Waiting for weather service healthcheck..."
+            sleep 2
+          done
+          if [ -z "$STATUS" ]; then
+            echo "Weather service did not become healthy in time" >&2
+            exit 1
+          fi
+
       - name: Run all integration tests via Docker Compose
         run: docker compose -f docker-compose.test.yml up --build --abort-on-container-exit gateway-integration-test
 
