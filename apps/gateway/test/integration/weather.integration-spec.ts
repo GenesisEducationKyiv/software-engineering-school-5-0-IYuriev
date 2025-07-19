@@ -22,7 +22,7 @@ describe('Weather API (Integration)', () => {
 
   afterAll(async () => {
     await app.close();
-  }, 20000);
+  });
 
   it('should return weather for a valid city', async () => {
     const res = await request(app.getHttpServer())
@@ -32,7 +32,7 @@ describe('Weather API (Integration)', () => {
     expect(res.body).toHaveProperty('temperature');
     expect(res.body).toHaveProperty('humidity');
     expect(res.body).toHaveProperty('description');
-  }, 10000);
+  });
 
   it('should return 404 for an invalid city', async () => {
     await request(app.getHttpServer())
