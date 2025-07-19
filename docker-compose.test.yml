@@ -134,6 +134,11 @@ services:
     volumes:
       - .:/app
       - weather-data-test:/app/node_modules
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4001/api/weather?city=London"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   subscription:
     container_name: subscription
