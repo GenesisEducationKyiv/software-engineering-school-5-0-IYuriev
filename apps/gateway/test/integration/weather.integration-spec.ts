@@ -32,7 +32,7 @@ describe('Weather API (Integration)', () => {
     expect(res.body).toHaveProperty('temperature');
     expect(res.body).toHaveProperty('humidity');
     expect(res.body).toHaveProperty('description');
-  });
+  }, 10000);
 
   it('should return 404 for an invalid city', async () => {
     await request(app.getHttpServer())

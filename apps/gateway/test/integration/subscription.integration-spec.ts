@@ -34,7 +34,6 @@ describe('Subscription API (Integration)', () => {
       .send({ email: testEmail, city: testCity, frequency: testFrequency })
       .expect(201);
     testToken = res.body.token;
-    console.log('Test token:', testToken);
     expect(res.body).toHaveProperty('message');
     expect(res.body.message).toContain('Subscription successful');
   });
