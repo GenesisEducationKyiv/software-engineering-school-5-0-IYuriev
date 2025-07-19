@@ -4,7 +4,7 @@ import { WeatherProvider } from './weather-client.provider';
 import { CityValidatable, WeatherClient } from '../../domain/weather.interface';
 import { Weather } from '../../domain/weather.entity';
 import { HttpClient } from '../../../../../libs/common/http/http.client';
-import { OpenWeatherData } from '../../../../../libs/constants/types/weather';
+import { OpenWeatherData } from '../../constants/types/weather';
 import { RpcException } from '@nestjs/microservices';
 
 @Injectable()

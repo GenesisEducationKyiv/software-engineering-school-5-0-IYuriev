@@ -4,9 +4,9 @@ import { Weather } from '../../domain/weather.entity';
 import { WeatherProvider } from './weather-client.provider';
 import { CityValidatable, WeatherClient } from '../../domain/weather.interface';
 import { HttpClient } from '../../../../../libs/common/http/http.client';
-import { WeatherAPIData } from '../../../../../libs/constants/types/weather';
-import { WeatherApiEndpoint } from '../../../../../libs/constants/enums/weather';
-import { CityResponse } from '../../../../../libs/constants/types/city';
+import { WeatherAPIData } from '../../constants/types/weather';
+import { WeatherApiEndpoint } from '../../constants/enums/weather';
+import { CityResponse } from '../../constants/types/city';
 import { RpcException } from '@nestjs/microservices';
 
 @Injectable()

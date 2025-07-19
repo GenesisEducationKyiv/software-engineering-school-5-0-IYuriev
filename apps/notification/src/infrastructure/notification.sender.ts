@@ -5,7 +5,7 @@ import {
   NotificationSend,
 } from '../application/interfaces/notification-sender.interface';
 import { SubscriptionEntity } from '../../../subscription/src/domain/subscription/subscription.entity';
-import { formatWeatherMessage } from '../../../../libs/utils/notification/notification.format';
+import { formatWeatherMessage } from '../utils/notification/notification.format';
 import { AppEmailClient } from '../application/interfaces/email.client.interface';
 import { AppWeatherClient } from '../application/interfaces/weather.client.interface';
 import { AppSubscriptionClient } from '../application/interfaces/subscription.client.interface';
