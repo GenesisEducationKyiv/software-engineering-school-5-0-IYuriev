@@ -12,7 +12,6 @@ export class EmailKafkaController {
 
   @EventPattern(EMAIL_EVENTS.SEND_FORECAST_EMAIL)
   async handleEmailEvent(@Payload() payload: EmailPayload): Promise<void> {
-    console.log('Received email event:', payload);
     await this.emailService.sendForecastEmail(payload);
   }
 }
