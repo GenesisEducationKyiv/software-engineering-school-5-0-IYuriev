@@ -20,6 +20,7 @@ import { NotificationSend } from '../application/interfaces/notification-sender.
 import { NotificationSender } from './notification.sender';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NotificationService } from '../application/use-case/notification.service';
+import { EmailPublisher } from './publisher/email.publisher';
 
 @Module({
   imports: [
@@ -61,10 +62,33 @@ import { NotificationService } from '../application/use-case/notification.servic
         }),
         inject: [ConfigService],
       },
+      {
+        name: 'KAFKA_SERVICE',
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.KAFKA,
+          options: {
+            client: {
+              brokers: [config.get<string>('KAFKA_BROKER_URL')].filter(
+                Boolean,
+              ) as string[],
+            },
+            consumer: {
+              groupId: 'notification-service',
+            },
+            producer: {
+              allowAutoTopicCreation: true,
+            },
+            producerOnlyMode: true,
+          },
+        }),
+
+        inject: [ConfigService],
+      },
     ]),
   ],
   providers: [
     NotificationService,
+    EmailPublisher,
     {
       provide: AppSubscriptionClient,
       useClass: SubscriptionGrpcClient,

@@ -6,10 +6,10 @@ import {
 } from '../application/interfaces/notification-sender.interface';
 import { SubscriptionEntity } from '../../../subscription/src/domain/subscription/subscription.entity';
 import { formatWeatherMessage } from '../utils/notification/notification.format';
-import { AppEmailClient } from '../application/interfaces/email.client.interface';
 import { AppWeatherClient } from '../application/interfaces/weather.client.interface';
 import { AppSubscriptionClient } from '../application/interfaces/subscription.client.interface';
 import { mapPrismaFrequencyToGrpc } from './mappers/frequency.mapper';
+import { EmailPublisher } from './publisher/email.publisher';
 
 @Injectable()
 export class NotificationSender implements NotificationSend {
@@ -17,7 +17,7 @@ export class NotificationSender implements NotificationSend {
 
   constructor(
     private readonly config: ConfigService,
-    private readonly emailService: AppEmailClient,
+    private readonly emailPublisher: EmailPublisher,
     private readonly weatherService: AppWeatherClient,
     private readonly subscriptionClient: AppSubscriptionClient,
   ) {}
@@ -27,7 +27,7 @@ export class NotificationSender implements NotificationSend {
     const link = `${this.unsubscribeUrl}/${sub.tokens[0].token}`;
     const message = formatWeatherMessage(sub.city, weather, link);
 
-    await this.emailService.sendForecastEmail({
+    this.emailPublisher.sendEmailEvent({
       to: sub.email,
       subject: sub.city,
       text: message,

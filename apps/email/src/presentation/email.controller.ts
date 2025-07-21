@@ -4,19 +4,12 @@ import {
   SuccesResponse,
 } from './../../../../libs/proto/generated/email';
 import { Controller } from '@nestjs/common';
-import { Inject } from '@nestjs/common';
-import {
-  EmailProvider,
-  EmailServiceToken,
-} from '../domain/email-service.interface';
+import { EmailProvider } from '../domain/email-service.interface';
 import { GrpcMethod } from '@nestjs/microservices';
 
 @Controller('email')
 export class EmailController {
-  constructor(
-    @Inject(EmailServiceToken)
-    private readonly emailService: EmailProvider,
-  ) {}
+  constructor(private readonly emailService: EmailProvider) {}
 
   @GrpcMethod('EmailService', 'SendConfirmationEmail')
   async sendConfirmationEmail(
