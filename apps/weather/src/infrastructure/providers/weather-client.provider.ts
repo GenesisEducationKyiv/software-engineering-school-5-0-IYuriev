@@ -29,7 +29,7 @@ export abstract class WeatherProvider {
       }
       throw new RpcException({
         code: 5,
-        message: 'City not found in any provider',
+        message: 'City not found',
       });
     }
   }

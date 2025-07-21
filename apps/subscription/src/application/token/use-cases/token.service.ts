@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { randomUUID } from 'node:crypto';
 import { TokenRepo } from '../interfaces/token-repository.interface';
 import { TokenProvider } from '../../../domain/token/token-service.interface';
@@ -16,7 +17,7 @@ export class TokenService implements TokenProvider {
 
   async getValidToken(token: string): Promise<TokenEntity> {
     const dbToken = await this.tokenRepo.findByToken(token);
-    if (!dbToken) throw new BadRequestException('Invalid token');
+    if (!dbToken) throw new RpcException({ code: 3, message: 'Invalid token' });
     return dbToken;
   }
 }

@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 export class CreateSubscriptionDto {
   @IsNotEmpty()
   @IsString()
-  @IsEmail({}, { message: 'Invalid input' })
+  @IsEmail({}, { message: 'Invalid email input' })
   email: string;
 
   @IsNotEmpty()
