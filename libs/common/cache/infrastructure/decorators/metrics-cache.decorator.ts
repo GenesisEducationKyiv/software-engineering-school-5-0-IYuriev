@@ -1,4 +1,4 @@
-import { MetricsService } from '../../../../../libs/common/metrics/metrics.service';
+import { MetricsService } from '../metrics/metrics.service';
 import { CacheService } from '../../application/cache.interface';
 import { CacheTTL } from '../../../../../libs/constants/enums/cache';
 
