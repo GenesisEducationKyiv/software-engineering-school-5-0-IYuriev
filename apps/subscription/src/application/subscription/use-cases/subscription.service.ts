@@ -6,12 +6,12 @@ import {
 import { SubscriptionRepo } from '../interfaces/subscription-repoository.interface';
 import { TokenProvider } from '../../../domain/token/token-service.interface';
 import { RpcException } from '@nestjs/microservices';
-import { AppEmailClient } from '../interfaces/email.client.interface';
+import { EmailPublish } from '../interfaces/email.publisher.interface';
 
 @Injectable()
 export class SubscriptionService implements SubscriptionProvider {
   constructor(
-    private readonly emailClient: AppEmailClient,
+    private readonly emailPublisher: EmailPublish,
     private readonly subscriptionRepo: SubscriptionRepo,
     private readonly tokenService: TokenProvider,
   ) {}
@@ -24,7 +24,7 @@ export class SubscriptionService implements SubscriptionProvider {
     const { email } = payload;
     const subscription = await this.subscriptionRepo.create(payload);
     const token = await this.tokenService.createConfirmToken(subscription.id);
-    await this.emailClient.sendConfirmationEmail({ email, token });
+    this.emailPublisher.sendConfirmationEmail({ email, token });
   }
 
   async confirm(token: string): Promise<void> {

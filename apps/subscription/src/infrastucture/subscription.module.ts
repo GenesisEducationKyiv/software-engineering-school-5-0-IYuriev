@@ -1,42 +1,43 @@
 import { Module } from '@nestjs/common';
-import { ClientGrpc, ClientsModule, Transport } from '@nestjs/microservices';
-import {
-  AppEmailClient,
-  EMAIL_PACKAGE,
-} from '../application/subscription/interfaces/email.client.interface';
-import { EmailGrpcClient } from './clients/email.client';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EmailPublisher } from './publishers/email.publisher';
+import { EmailPublish } from '../application/subscription/interfaces/email.publisher.interface';
 
 @Module({
   imports: [
     ConfigModule,
     ClientsModule.registerAsync([
       {
-        name: EMAIL_PACKAGE,
+        name: 'KAFKA_SERVICE',
         useFactory: (config: ConfigService) => ({
-          transport: Transport.GRPC,
+          transport: Transport.KAFKA,
           options: {
-            package: 'email',
-            protoPath: 'libs/proto/src/email.proto',
-            url: config.get<string>('EMAIL_GRPC_URL'),
+            client: {
+              brokers: [config.get<string>('KAFKA_BROKER_URL')].filter(
+                Boolean,
+              ) as string[],
+            },
+            consumer: {
+              groupId: 'subscription-service',
+            },
+            producer: {
+              allowAutoTopicCreation: true,
+            },
+            producerOnlyMode: true,
           },
         }),
+
         inject: [ConfigService],
       },
     ]),
   ],
   providers: [
     {
-      provide: AppEmailClient,
-      useClass: EmailGrpcClient,
-    },
-    {
-      provide: 'EmailService',
-      useFactory: (client: ClientGrpc) =>
-        client.getService<EmailGrpcClient>('EmailService'),
-      inject: [EMAIL_PACKAGE],
+      provide: EmailPublish,
+      useClass: EmailPublisher,
     },
   ],
-  exports: [AppEmailClient],
+  exports: [EmailPublish],
 })
 export class SubscriptionModule {}

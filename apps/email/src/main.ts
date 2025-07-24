@@ -2,23 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { join } from 'path';
 dotenv.config({ path: '.env.email' });
 
 async function bootstrap() {
-  const port = process.env.PORT;
-  const grpcMicroservice =
-    await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-      transport: Transport.GRPC,
-      options: {
-        package: 'email',
-        protoPath: join(__dirname, '../../../libs/proto/src/email.proto'),
-        url: `0.0.0.0:${port}`,
-      },
-    });
-
-  const kafkaMicroservice =
-    await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
+    {
       transport: Transport.KAFKA,
       options: {
         client: {
@@ -29,9 +18,9 @@ async function bootstrap() {
           groupId: 'email-service',
         },
       },
-    });
-
-  await Promise.all([grpcMicroservice.listen(), kafkaMicroservice.listen()]);
+    },
+  );
+  await app.listen();
 }
 bootstrap().catch((err) => {
   console.error('Error during bootstrap in Email app:', err);

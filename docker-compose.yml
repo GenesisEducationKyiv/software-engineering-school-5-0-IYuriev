@@ -51,6 +51,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
     volumes:
       - .:/app
       - email-data:/app/node_modules
@@ -147,6 +151,18 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+
+  kafka-init:
+    image: bitnami/kafka:latest
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic send-confirmation-email --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 || true
+        /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic send-forecast-email --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 || true
+    restart: "no"
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest

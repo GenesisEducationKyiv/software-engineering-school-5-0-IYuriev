@@ -9,7 +9,7 @@ import { formatWeatherMessage } from '../utils/notification/notification.format'
 import { AppWeatherClient } from '../application/interfaces/weather.client.interface';
 import { AppSubscriptionClient } from '../application/interfaces/subscription.client.interface';
 import { mapPrismaFrequencyToGrpc } from './mappers/frequency.mapper';
-import { EmailPublisher } from './publisher/email.publisher';
+import { EmailPublisher } from './publishers/email.publisher';
 
 @Injectable()
 export class NotificationSender implements NotificationSend {
