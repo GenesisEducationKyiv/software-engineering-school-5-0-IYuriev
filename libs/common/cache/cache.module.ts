@@ -5,6 +5,9 @@ import { CacheService } from './application/cache.interface';
 import { MetricsService } from '../metrics/metrics.service';
 import { MetricsCacheDecorator } from './infrastructure/decorators/metrics-cache.decorator';
 import { ConfigModule } from '@nestjs/config';
+import { WinstonLogger } from '../logger/logger.service';
+import { LogCacheServiceDecorator } from './infrastructure/decorators/logger-cache.decorator';
+import { CACHE_SERVICE_LOGGER } from '../logger/logger.module';
 
 @Module({
   imports: [MetricsModule, ConfigModule],
@@ -12,9 +15,15 @@ import { ConfigModule } from '@nestjs/config';
     RedisCacheService,
     {
       provide: CacheService,
-      useFactory: (redisCache: RedisCacheService, metrics: MetricsService) =>
-        new MetricsCacheDecorator(redisCache, metrics),
-      inject: [RedisCacheService, MetricsService],
+      useFactory: (
+        redisCache: RedisCacheService,
+        metrics: MetricsService,
+        logger: WinstonLogger,
+      ) => {
+        const metricsDecorator = new MetricsCacheDecorator(redisCache, metrics);
+        return new LogCacheServiceDecorator(metricsDecorator, logger);
+      },
+      inject: [RedisCacheService, MetricsService, CACHE_SERVICE_LOGGER],
     },
   ],
   exports: [CacheService],

@@ -2,11 +2,13 @@ import { WinstonLogger } from '../../../../../libs/common/logger/logger.service'
 import { CityValidatable } from '../../domain/weather.interface';
 import { WeatherProvider } from '../providers/weather-client.provider';
 import { Weather } from '../../domain/weather.entity';
+import { Inject } from '@nestjs/common';
+import { WEATHER_MODULE_LOGGER } from '../../../../../libs/common/logger/logger.module';
 
 export class LogWeatherClientDecorator extends WeatherProvider {
   constructor(
     private readonly provider: WeatherProvider & CityValidatable,
-    private readonly logger: WinstonLogger,
+    @Inject(WEATHER_MODULE_LOGGER) private readonly logger: WinstonLogger,
     private readonly providerName: string,
   ) {
     super();

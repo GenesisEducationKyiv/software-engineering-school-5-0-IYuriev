@@ -3,11 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { Weather } from '../../domain/weather.entity';
 import { WeatherProvider } from './weather-client.provider';
 import { CityValidatable, WeatherClient } from '../../domain/weather.interface';
-import { HttpClient } from '../../../../../libs/common/http/http.client';
 import { WeatherAPIData } from '../../constants/types/weather';
 import { WeatherApiEndpoint } from '../../constants/enums/weather';
 import { CityResponse } from '../../constants/types/city';
 import { RpcException } from '@nestjs/microservices';
+import { LogHttpClientDecorator } from '../../../../../libs/common/http/logger-http.decorator';
 
 @Injectable()
 export class WeatherApiProvider
@@ -18,7 +18,7 @@ export class WeatherApiProvider
   private readonly WEATHER_API_URL: string;
 
   constructor(
-    private readonly httpClient: HttpClient,
+    private readonly httpClient: LogHttpClientDecorator,
     private readonly config: ConfigService,
   ) {
     super();

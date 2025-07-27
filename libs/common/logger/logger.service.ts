@@ -1,5 +1,5 @@
 import { Injectable, LoggerService } from '@nestjs/common';
-import { getWinstonFormat } from '../../utils/logger/logger.format';
+import { getWinstonFormat } from './logger.format';
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
 import * as fs from 'fs';
@@ -8,8 +8,10 @@ import * as path from 'path';
 @Injectable()
 export class WinstonLogger implements LoggerService {
   private logger: winston.Logger;
+  private serviceName: string;
 
-  constructor() {
+  constructor(serviceName = 'unknown-service') {
+    this.serviceName = serviceName;
     const logsDir = path.resolve(process.cwd(), 'logs');
     if (!fs.existsSync(logsDir)) {
       fs.mkdirSync(logsDir, { recursive: true });
@@ -20,19 +22,17 @@ export class WinstonLogger implements LoggerService {
       datePattern: 'YYYY-MM-DD',
       maxFiles: '14d',
       zippedArchive: true,
-      level: 'info',
+      level: 'debug',
     });
 
     const consoleTransport = new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple(),
-      ),
+      format: getWinstonFormat(this.serviceName),
     });
 
     this.logger = winston.createLogger({
-      level: 'info',
-      format: getWinstonFormat(),
+      level: 'debug',
+      format: getWinstonFormat(this.serviceName),
+      defaultMeta: { service: this.serviceName },
       transports: [dailyRotateFile, consoleTransport],
       exceptionHandlers: [
         new winston.transports.File({

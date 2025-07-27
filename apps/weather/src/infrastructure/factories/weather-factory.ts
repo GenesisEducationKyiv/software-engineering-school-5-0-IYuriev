@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CacheWeatherClientProxy } from '../proxies/cache-weather-client.proxy';
 import { WeatherApiProvider } from '../providers/weather-api.provider';
 import { OpenWeatherProvider } from '../providers/open-weather.provider';
@@ -6,6 +6,7 @@ import { LogWeatherClientDecorator } from '../decorators/log-weather-client.deco
 import { CacheService } from '../../../../../libs/common/cache/application/cache.interface';
 import { WinstonLogger } from '../../../../../libs/common/logger/logger.service';
 import { WeatherClient } from '../../domain/weather.interface';
+import { WEATHER_MODULE_LOGGER } from '../../../../../libs/common/logger/logger.module';
 
 @Injectable()
 export class WeatherFactory {
@@ -13,7 +14,7 @@ export class WeatherFactory {
     private readonly weatherAPI: WeatherApiProvider,
     private readonly openWeather: OpenWeatherProvider,
     private readonly cache: CacheService,
-    private readonly logger: WinstonLogger,
+    @Inject(WEATHER_MODULE_LOGGER) private readonly logger: WinstonLogger,
   ) {}
 
   create(): WeatherClient {
