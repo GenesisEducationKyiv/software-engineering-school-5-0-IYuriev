@@ -10,7 +10,7 @@ import { NotificationProvider } from '../../domain/notification-service.interfac
 export class NotificationService implements NotificationProvider {
   constructor(private readonly notificationSender: NotificationSend) {}
 
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_MINUTE)
   async notifyHourly(): Promise<void> {
     await this.notifySubscribers(Frequency.HOURLY);
   }

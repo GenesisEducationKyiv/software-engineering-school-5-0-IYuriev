@@ -6,6 +6,9 @@ import { HttpModule } from '../../../libs/common/http/http.module';
 import { EmailTransportToken } from './application/interfaces/email-transport.interface';
 import { ConfigModule } from '@nestjs/config';
 import { EmailController } from './presentation/email.controller';
+import { LogEmailServiceDecorator } from './common/decorators/log-email-service.decorator';
+import { WinstonLogger } from '../../../libs/common/logger/logger.service';
+import { EMAIL_SERVICE_LOGGER } from '../../../libs/common/logger/logger.module';
 
 @Module({
   imports: [ConfigModule, HttpModule],
@@ -19,7 +22,9 @@ import { EmailController } from './presentation/email.controller';
     },
     {
       provide: EmailProvider,
-      useExisting: EmailService,
+      useFactory: (provider: EmailService, logger: WinstonLogger) =>
+        new LogEmailServiceDecorator(provider, logger),
+      inject: [EmailService, EMAIL_SERVICE_LOGGER],
     },
   ],
 })
