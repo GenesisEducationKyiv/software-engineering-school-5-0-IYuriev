@@ -5,6 +5,10 @@ import {
 } from '../../../../../libs/constants/types/email';
 import { WinstonLogger } from '../../../../../libs/common/logger/logger.service';
 
+function shouldLog(sampleRate: number): boolean {
+  return Math.random() < sampleRate;
+}
+
 export class LogEmailServiceDecorator implements EmailProvider {
   constructor(
     private readonly provider: EmailProvider,
@@ -17,9 +21,11 @@ export class LogEmailServiceDecorator implements EmailProvider {
     const start = Date.now();
     try {
       await this.provider.sendConfirmationEmail(payload);
-      this.logger.log(`Send confirmation email success`, start, {
-        email: payload.email,
-      });
+      if (shouldLog(0.1)) {
+        this.logger.log(`Send confirmation email success`, start, {
+          email: payload.email,
+        });
+      }
     } catch (error: unknown) {
       this.logger.error(`Send confirmation email error`, start, {
         email: payload.email,
@@ -33,7 +39,9 @@ export class LogEmailServiceDecorator implements EmailProvider {
     const start = Date.now();
     try {
       await this.provider.sendForecastEmail(payload);
-      this.logger.log(`Send forecast email success`, start, { payload });
+      if (shouldLog(0.1)) {
+        this.logger.log(`Send forecast email success`, start, { payload });
+      }
     } catch (error: unknown) {
       this.logger.error(`Send forecast email error`, start, {
         payload,
