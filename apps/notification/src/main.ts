@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import * as dotenv from 'dotenv';
 import { AppModule } from './app.module';
-dotenv.config({ path: '.env.notification' });
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(Number(process.env.PORT));
+  const config = app.get(ConfigService);
+  await app.listen(Number(config.get<string>('PORT')));
 }
 
 bootstrap().catch((err) => {
