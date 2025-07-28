@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { EmailPublisher } from './publishers/email.publisher';
-import { EmailPublish } from '../application/subscription/interfaces/email.publisher.interface';
+import { KafkaEmailPublisher } from './publishers/email.publisher';
+import { EmailPublisher } from '../application/subscription/interfaces/email.publisher.interface';
 
 @Module({
   imports: [
@@ -34,10 +34,10 @@ import { EmailPublish } from '../application/subscription/interfaces/email.publi
   ],
   providers: [
     {
-      provide: EmailPublish,
-      useClass: EmailPublisher,
+      provide: EmailPublisher,
+      useClass: KafkaEmailPublisher,
     },
   ],
-  exports: [EmailPublish],
+  exports: [EmailPublisher],
 })
 export class SubscriptionModule {}
