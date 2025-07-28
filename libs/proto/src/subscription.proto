@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package subscription;
+
+enum Frequency {
+  hourly = 0;
+  daily = 1;
+}
+
+service SubscriptionService {
+  rpc Subscribe (SubscribeRequest) returns (SuccessResponse);
+  rpc Confirm (TokenRequest) returns (SuccessResponse);
+  rpc Unsubscribe (TokenRequest) returns (SuccessResponse);
+  rpc GetConfirmedSubscriptions (GetConfirmedSubscriptionsRequest) returns (GetConfirmedSubscriptionsResponse);
+}
+
+message SubscribeRequest {
+  string email = 1;
+  string city = 2;
+  Frequency frequency = 3;
+}
+
+message SuccessResponse {
+  bool success = 1;
+}
+
+message TokenRequest {
+  string token = 1;
+}
+
+message GetConfirmedSubscriptionsRequest {
+  Frequency frequency = 1;
+}
+
+message SubscriptionEntity {
+  int32 id = 1;
+  string email = 2;
+  string city = 3;
+  Frequency frequency = 4;
+  bool confirmed = 5;
+  repeated TokenEntity tokens = 6;
+  string createdAt = 7;
+  string updatedAt = 8;
+}
+
+message TokenEntity {
+  int32 id = 1;
+  string token = 2;
+  int32 subscriptionId = 3;
+  string createdAt = 4;
+}
+
+message GetConfirmedSubscriptionsResponse {
+  repeated SubscriptionEntity subscriptions = 1;
+}
