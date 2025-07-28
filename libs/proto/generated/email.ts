@@ -16,7 +16,7 @@ export interface SendForecastEmailRequest {
   text: string;
 }
 
-export interface SuccesResponse {
+export interface SuccessResponse {
   success: boolean;
 }
 

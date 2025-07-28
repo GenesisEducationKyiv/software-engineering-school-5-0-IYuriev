@@ -6,7 +6,10 @@ import {
   EmailTransportToken,
 } from '../interfaces/email-transport.interface';
 import { Email } from '../../../../../libs/constants/enums/email';
-import { EmailPayload } from '../../../../../libs/constants/types/email';
+import {
+  EmailConfirmationPayload,
+  EmailForecastPayload,
+} from '../../../../../libs/constants/types/email';
 
 @Injectable()
 export class EmailService implements EmailProvider {
@@ -19,17 +22,19 @@ export class EmailService implements EmailProvider {
     this.confirmationUrl = this.config.get<string>('CONFIRMATION_URL') ?? '';
   }
 
-  async sendConfirmationEmail(email: string, token: string): Promise<void> {
-    const link = `${this.confirmationUrl}/${token}`;
+  async sendConfirmationEmail(
+    payload: EmailConfirmationPayload,
+  ): Promise<void> {
+    const link = `${this.confirmationUrl}/${payload.token}`;
     await this.emailTransport.sendMail({
       from: this.config.get<string>('EMAIL_USER') ?? '',
-      to: email,
+      to: payload.email,
       subject: Email.SUBJECT,
       text: `${Email.TEXT}${link}`,
     });
   }
 
-  async sendForecastEmail(payload: EmailPayload): Promise<void> {
+  async sendForecastEmail(payload: EmailForecastPayload): Promise<void> {
     await this.emailTransport.sendMail({
       from: this.config.get<string>('EMAIL_USER') ?? '',
       ...payload,

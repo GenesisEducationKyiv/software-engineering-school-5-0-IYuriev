@@ -29,7 +29,6 @@ export class SubscriptionApiController {
 
   @GrpcMethod('SubscriptionService', 'Confirm')
   async confirm(data: TokenRequest): Promise<SuccessResponse> {
-    console.log('Confirming subscription with token:', data.token);
     await this.subscriptionService.confirm(data.token);
     return { success: true };
   }

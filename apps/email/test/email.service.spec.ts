@@ -1,7 +1,10 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Email } from '../../../libs/constants/enums/email';
-import { EmailPayload } from '../../../libs/constants/types/email';
+import {
+  EmailConfirmationPayload,
+  EmailForecastPayload,
+} from '../../../libs/constants/types/email';
 import { EmailTransportToken } from '../src/application/interfaces/email-transport.interface';
 import { EmailService } from '../src/application/use-case/email.service';
 
@@ -33,30 +36,35 @@ describe('EmailService', () => {
 
   describe('sendConfirmationEmail', () => {
     it('should send confirmation email with correct params', async () => {
-      const email = 'user@example.com';
-      const token = 'sometoken';
+      const payload: EmailConfirmationPayload = {
+        email: 'user@example.com',
+        token: 'sometoken',
+      };
 
-      await service.sendConfirmationEmail(email, token);
+      await service.sendConfirmationEmail(payload);
 
       expect(mockEmailTransport.sendMail).toHaveBeenCalledWith({
         from: config.get<string>('EMAIL_USER'),
-        to: email,
+        to: payload.email,
         subject: Email.SUBJECT,
-        text: `${Email.TEXT}${config.get<string>('CONFIRMATION_URL')}/${token}`,
+        text: `${Email.TEXT}${config.get<string>('CONFIRMATION_URL')}/${payload.token}`,
       });
     });
 
     it('should propagate errors from emailTransport', async () => {
       mockEmailTransport.sendMail.mockRejectedValueOnce(new Error('fail'));
       await expect(
-        service.sendConfirmationEmail('fail@example.com', 'token'),
+        service.sendConfirmationEmail({
+          email: 'fail@example.com',
+          token: 'token',
+        }),
       ).rejects.toThrow('fail');
     });
   });
 
   describe('sendForecastEmail', () => {
     it('should send forecast email with correct payload', async () => {
-      const payload: EmailPayload = {
+      const payload: EmailForecastPayload = {
         to: 'forecast@example.com',
         subject: 'Weather Update',
         text: 'Today is sunny!',

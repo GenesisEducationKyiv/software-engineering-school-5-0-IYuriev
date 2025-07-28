@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { EmailServiceToken } from './domain/email-service.interface';
+import { EmailProvider } from './domain/email-service.interface';
 import { EmailService } from './application/use-case/email.service';
 import { NodemailerService } from './infrastructure/nodemailer.service';
-import { EmailController } from './presentation/email.controller';
 import { HttpModule } from '../../../libs/common/http/http.module';
 import { EmailTransportToken } from './application/interfaces/email-transport.interface';
 import { ConfigModule } from '@nestjs/config';
+import { EmailController } from './presentation/email.controller';
 
 @Module({
   imports: [ConfigModule, HttpModule],
@@ -18,7 +18,7 @@ import { ConfigModule } from '@nestjs/config';
       useExisting: NodemailerService,
     },
     {
-      provide: EmailServiceToken,
+      provide: EmailProvider,
       useExisting: EmailService,
     },
   ],

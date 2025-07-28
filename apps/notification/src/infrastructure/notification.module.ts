@@ -1,10 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ClientGrpc, ClientsModule, Transport } from '@nestjs/microservices';
-import {
-  AppEmailClient,
-  EMAIL_PACKAGE,
-} from '../application/interfaces/email.client.interface';
-import { GrpcEmailClient } from './clients/email.client';
 import { GrpcWeatherClient } from './clients/weather.client';
 import {
   AppWeatherClient,
@@ -20,23 +15,13 @@ import { NotificationSend } from '../application/interfaces/notification-sender.
 import { NotificationSender } from './notification.sender';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NotificationService } from '../application/use-case/notification.service';
+import { EmailPublisher } from './publishers/email.publisher';
+import { EmailPublish } from '../application/interfaces/email.publisher.interface';
 
 @Module({
   imports: [
     ConfigModule,
     ClientsModule.registerAsync([
-      {
-        name: EMAIL_PACKAGE,
-        useFactory: (config: ConfigService) => ({
-          transport: Transport.GRPC,
-          options: {
-            package: 'email',
-            protoPath: 'libs/proto/src/email.proto',
-            url: config.get<string>('EMAIL_GRPC_URL'),
-          },
-        }),
-        inject: [ConfigService],
-      },
       {
         name: WEATHER_PACKAGE,
         useFactory: (config: ConfigService) => ({
@@ -61,10 +46,33 @@ import { NotificationService } from '../application/use-case/notification.servic
         }),
         inject: [ConfigService],
       },
+      {
+        name: 'KAFKA_SERVICE',
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.KAFKA,
+          options: {
+            client: {
+              brokers: [config.get<string>('KAFKA_BROKER_URL')].filter(
+                Boolean,
+              ) as string[],
+            },
+            consumer: {
+              groupId: 'notification-service',
+            },
+            producer: {
+              allowAutoTopicCreation: true,
+            },
+            producerOnlyMode: true,
+          },
+        }),
+
+        inject: [ConfigService],
+      },
     ]),
   ],
   providers: [
     NotificationService,
+    EmailPublisher,
     {
       provide: AppSubscriptionClient,
       useClass: SubscriptionGrpcClient,
@@ -74,8 +82,8 @@ import { NotificationService } from '../application/use-case/notification.servic
       useClass: NotificationSender,
     },
     {
-      provide: AppEmailClient,
-      useClass: GrpcEmailClient,
+      provide: EmailPublish,
+      useClass: EmailPublisher,
     },
     {
       provide: AppWeatherClient,
@@ -88,12 +96,6 @@ import { NotificationService } from '../application/use-case/notification.servic
       inject: [SUBSCRIPTION_PACKAGE],
     },
     {
-      provide: 'EmailService',
-      useFactory: (client: ClientGrpc) =>
-        client.getService<GrpcEmailClient>('EmailService'),
-      inject: [EMAIL_PACKAGE],
-    },
-    {
       provide: 'WeatherService',
       useFactory: (client: ClientGrpc) =>
         client.getService<GrpcWeatherClient>('WeatherService'),
@@ -101,10 +103,10 @@ import { NotificationService } from '../application/use-case/notification.servic
     },
   ],
   exports: [
-    AppEmailClient,
     AppWeatherClient,
     AppSubscriptionClient,
     NotificationSend,
+    EmailPublish,
   ],
 })
 export class NotificationModule {}

@@ -1,25 +1,30 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as dotenv from 'dotenv';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { join } from 'path';
-dotenv.config({ path: '.env.email' });
+import { Transport } from '@nestjs/microservices';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
-  const port = process.env.PORT;
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    AppModule,
-    {
-      transport: Transport.GRPC,
-      options: {
-        package: 'email',
-        protoPath: join(__dirname, '../../../libs/proto/src/email.proto'),
-        url: `0.0.0.0:${port}`,
+  const app = await NestFactory.create(AppModule);
+  const config = app.get(ConfigService);
+
+  app.connectMicroservice({
+    transport: Transport.KAFKA,
+    options: {
+      client: {
+        brokers: [config.get<string>('KAFKA_BROKER_URL')].filter(
+          Boolean,
+        ) as string[],
+        clientId: 'email-service',
+      },
+      consumer: {
+        groupId: 'email-service',
       },
     },
-  );
-  await app.listen();
+  });
+
+  await app.startAllMicroservices();
 }
+
 bootstrap().catch((err) => {
   console.error('Error during bootstrap in Email app:', err);
   process.exit(1);

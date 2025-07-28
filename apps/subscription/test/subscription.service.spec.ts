@@ -1,14 +1,15 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { SubscriptionService } from '../src/application/subscription/use-cases/subscription.service';
 import { RpcException } from '@nestjs/microservices';
-import { EmailGrpcClient } from '../src/infrastucture/clients/email.client';
 import { SubscriptionRepo } from '../src/application/subscription/interfaces/subscription-repoository.interface';
 import { TokenProvider } from '../src/domain/token/token-service.interface';
 import { SubscriptionPayload } from '../src/domain/subscription/subscription-service.interface';
 import { Frequency } from '../src/domain/subscription/subscription.entity';
+import { EmailPublisher } from '../src/application/subscription/interfaces/email.publisher.interface';
 
 describe('SubscriptionService', () => {
   let service: SubscriptionService;
-  let emailClient: jest.Mocked<EmailGrpcClient>;
+  let emailPublisher: jest.Mocked<EmailPublisher>;
   let subscriptionRepo: jest.Mocked<SubscriptionRepo>;
   let tokenService: jest.Mocked<TokenProvider>;
 
@@ -19,9 +20,9 @@ describe('SubscriptionService', () => {
   };
 
   beforeEach(() => {
-    emailClient = {
+    emailPublisher = {
       sendConfirmationEmail: jest.fn(),
-    } as unknown as jest.Mocked<EmailGrpcClient>;
+    } as unknown as jest.Mocked<EmailPublisher>;
     subscriptionRepo = {
       findSubscription: jest.fn(),
       create: jest.fn(),
@@ -33,7 +34,7 @@ describe('SubscriptionService', () => {
       getValidToken: jest.fn(),
     } as unknown as jest.Mocked<TokenProvider>;
     service = new SubscriptionService(
-      emailClient,
+      emailPublisher,
       subscriptionRepo,
       tokenService,
     );
@@ -72,8 +73,8 @@ describe('SubscriptionService', () => {
       expect(subscriptionRepo.create.mock.calls[0][0]).toEqual(payload);
       expect(tokenService.createConfirmToken.mock.calls.length).toBe(1);
       expect(tokenService.createConfirmToken.mock.calls[0][0]).toEqual(2);
-      expect(emailClient.sendConfirmationEmail.mock.calls.length).toBe(1);
-      expect(emailClient.sendConfirmationEmail.mock.calls[0][0]).toEqual({
+      expect(emailPublisher.sendConfirmationEmail).toHaveBeenCalledTimes(1);
+      expect(emailPublisher.sendConfirmationEmail).toHaveBeenCalledWith({
         email: 'test@mail.com',
         token: 'token123',
       });
