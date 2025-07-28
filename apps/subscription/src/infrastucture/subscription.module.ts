@@ -17,6 +17,9 @@ import { TokenModule } from './token/token.module';
 import { HttpModule } from '../../../../libs/common/http/http.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { LogSubscriptionRepoDecorator } from '../common/decorators/log-subscription-repo.decorator';
+import { MetricsService } from '../common/metrics/metrics.service';
+import { MetricsSubscriptionDecorator } from '../common/decorators/metrics-subscription.decorator';
+import { MetricsModule } from '../common/metrics/metrics.module';
 
 @Module({
   imports: [
@@ -24,6 +27,7 @@ import { LogSubscriptionRepoDecorator } from '../common/decorators/log-subscript
     TokenModule,
     ConfigModule,
     PrismaModule,
+    MetricsModule,
     ClientsModule.registerAsync([
       {
         name: 'KAFKA_SERVICE',
@@ -64,9 +68,22 @@ import { LogSubscriptionRepoDecorator } from '../common/decorators/log-subscript
     },
     {
       provide: SubscriptionProvider,
-      useFactory: (provider: SubscriptionService, logger: WinstonLogger) =>
-        new LogUseCaseSubscriptionDecorator(provider, logger),
-      inject: [SubscriptionService, SUBSCRIPTION_SERVICE_LOGGER],
+      useFactory: (
+        provider: SubscriptionService,
+        metrics: MetricsService,
+        logger: WinstonLogger,
+      ) => {
+        const metricsDecorator = new MetricsSubscriptionDecorator(
+          provider,
+          metrics,
+        );
+        return new LogUseCaseSubscriptionDecorator(metricsDecorator, logger);
+      },
+      inject: [
+        SubscriptionService,
+        MetricsService,
+        SUBSCRIPTION_SERVICE_LOGGER,
+      ],
     },
   ],
   exports: [EmailPublish, SubscriptionProvider, SubscriptionRepo],

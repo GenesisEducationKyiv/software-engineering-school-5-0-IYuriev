@@ -3,9 +3,14 @@ import { SubscriptionApiController } from './presentation/subscription.controlle
 import { PrismaService } from './infrastucture/prisma/prisma.service';
 import { SubscriptionModule } from './infrastucture/subscription.module';
 import { ConfigModule } from '@nestjs/config';
+import { MetricsModule } from './common/metrics/metrics.module';
 
 @Module({
-  imports: [SubscriptionModule, ConfigModule.forRoot({ isGlobal: true })],
+  imports: [
+    SubscriptionModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    MetricsModule,
+  ],
   controllers: [SubscriptionApiController],
   providers: [PrismaService],
 })

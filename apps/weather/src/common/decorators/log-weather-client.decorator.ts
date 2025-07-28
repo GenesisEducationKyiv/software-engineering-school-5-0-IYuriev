@@ -1,6 +1,6 @@
 import { WinstonLogger } from '../../../../../libs/common/logger/logger.service';
 import { CityValidatable } from '../../domain/weather.interface';
-import { WeatherProvider } from '../providers/weather-client.provider';
+import { WeatherProvider } from '../../infrastructure/providers/weather-client.provider';
 import { Weather } from '../../domain/weather.entity';
 import { Inject } from '@nestjs/common';
 import { WEATHER_MODULE_LOGGER } from '../../../../../libs/common/logger/logger.module';

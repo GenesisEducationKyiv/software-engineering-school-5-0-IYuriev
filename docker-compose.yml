@@ -68,6 +68,7 @@ services:
       - apps/weather/.env.weather
     ports:
       - 4001:4001
+      - 5001:5001
     depends_on:
       db:
         condition: service_healthy
@@ -86,6 +87,7 @@ services:
       - apps/subscription/.env.subscription
     ports:
       - 4002:4002
+      - 5002:5002
     depends_on:
       db:
         condition: service_healthy
@@ -157,12 +159,12 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-    entrypoint: ["/bin/sh", "-c"]
+    entrypoint: ['/bin/sh', '-c']
     command:
       - |
         /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic send-confirmation-email --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 || true
         /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic send-forecast-email --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 || true
-    restart: "no"
+    restart: 'no'
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest

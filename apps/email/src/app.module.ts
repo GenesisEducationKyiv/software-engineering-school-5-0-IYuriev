@@ -6,12 +6,15 @@ import { HttpModule } from '../../../libs/common/http/http.module';
 import { EmailTransportToken } from './application/interfaces/email-transport.interface';
 import { ConfigModule } from '@nestjs/config';
 import { EmailController } from './presentation/email.controller';
-import { LogEmailServiceDecorator } from './common/decorators/log-email-service.decorator';
+import { LogEmailServiceDecorator } from './common/decorators/log-email.decorator';
 import { WinstonLogger } from '../../../libs/common/logger/logger.service';
 import { EMAIL_SERVICE_LOGGER } from '../../../libs/common/logger/logger.module';
+import { MetricsService } from './common/metrics/metrics.service';
+import { MetricsEmailDecorator } from './common/decorators/metrics-email.decorator';
+import { MetricsModule } from './common/metrics/metrics.module';
 
 @Module({
-  imports: [ConfigModule, HttpModule],
+  imports: [ConfigModule, HttpModule, MetricsModule],
   controllers: [EmailController],
   providers: [
     EmailService,
@@ -22,9 +25,15 @@ import { EMAIL_SERVICE_LOGGER } from '../../../libs/common/logger/logger.module'
     },
     {
       provide: EmailProvider,
-      useFactory: (provider: EmailService, logger: WinstonLogger) =>
-        new LogEmailServiceDecorator(provider, logger),
-      inject: [EmailService, EMAIL_SERVICE_LOGGER],
+      useFactory: (
+        provider: EmailService,
+        metrics: MetricsService,
+        logger: WinstonLogger,
+      ) => {
+        const metricsDecorator = new MetricsEmailDecorator(provider, metrics);
+        return new LogEmailServiceDecorator(metricsDecorator, logger);
+      },
+      inject: [EmailService, MetricsService, EMAIL_SERVICE_LOGGER],
     },
   ],
 })

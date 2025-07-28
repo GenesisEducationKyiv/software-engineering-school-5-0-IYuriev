@@ -124,6 +124,7 @@ services:
       - apps/weather/.env.test
     ports:
       - 4001:4001
+      - 5001:5001
     depends_on:
       db-test:
         condition: service_healthy
@@ -142,6 +143,7 @@ services:
       - apps/subscription/.env.test
     ports:
       - 4002:4002
+      - 5002:5002
     depends_on:
       db-test:
         condition: service_healthy
