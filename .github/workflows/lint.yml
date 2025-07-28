@@ -13,5 +13,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Generate Prisma Client
+        run: |
+          cd apps/subscription
+          npx prisma generate
+
       - name: Run ESLint
         run: npm run lint

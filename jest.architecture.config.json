@@ -1,9 +1,0 @@
-{
-  "testRegex": "test/architecture/.*\\.spec\\.ts$",
-  "moduleFileExtensions": ["ts", "js", "json"],
-  "transform": {
-    "^.+\\.(ts|tsx)$": "ts-jest"
-  },
-  "testEnvironment": "node",
-  "roots": ["<rootDir>/test/architecture"]
-}
