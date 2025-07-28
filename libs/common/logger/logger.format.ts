@@ -10,8 +10,13 @@ export const getWinstonFormat = (serviceName?: string) => {
       } else if (serviceName) {
         svc = serviceName;
       }
+      let duration = '';
+      if (meta && typeof meta.duration === 'string') {
+        duration = meta.duration;
+        delete meta.duration;
+      }
       const metaString = Object.keys(meta).length ? JSON.stringify(meta) : '';
-      return `[${String(level).toUpperCase()}] [${String(timestamp)}]${svc ? ` [${svc}]` : ''} ${typeof message === 'string' ? message : JSON.stringify(message)}${metaString ? ' ' + metaString : ''}`;
+      return `[${String(level).toUpperCase()}] [${String(timestamp)}]${svc ? ` [${svc}]` : ''} ${typeof message === 'string' ? message : JSON.stringify(message)}${metaString ? ' ' + metaString : ''}${duration ? ` - ${duration}` : ''}`;
     }),
   );
 };

@@ -14,13 +14,14 @@ export class LogEmailServiceDecorator implements EmailProvider {
   async sendConfirmationEmail(
     payload: EmailConfirmationPayload,
   ): Promise<void> {
+    const start = Date.now();
     try {
       await this.provider.sendConfirmationEmail(payload);
-      this.logger.log(`Send confirmation email success`, {
+      this.logger.log(`Send confirmation email success`, start, {
         email: payload.email,
       });
     } catch (error: unknown) {
-      this.logger.error(`Send confirmation email error`, {
+      this.logger.error(`Send confirmation email error`, start, {
         email: payload.email,
         error,
       });
@@ -29,11 +30,12 @@ export class LogEmailServiceDecorator implements EmailProvider {
   }
 
   async sendForecastEmail(payload: EmailForecastPayload): Promise<void> {
+    const start = Date.now();
     try {
       await this.provider.sendForecastEmail(payload);
-      this.logger.log(`Send forecast email success`, { payload });
+      this.logger.log(`Send forecast email success`, start, { payload });
     } catch (error: unknown) {
-      this.logger.error(`Send forecast email error`, {
+      this.logger.error(`Send forecast email error`, start, {
         payload,
         error,
       });

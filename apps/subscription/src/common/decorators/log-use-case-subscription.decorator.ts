@@ -11,13 +11,14 @@ export class LogUseCaseSubscriptionDecorator implements SubscriptionProvider {
   ) {}
 
   async subscribe(payload: SubscriptionPayload): Promise<void> {
+    const start = Date.now();
     try {
       await this.provider.subscribe(payload);
-      this.logger.log(`Subscribe success`, {
+      this.logger.log(`Subscribe success`, start, {
         payload,
       });
     } catch (error: unknown) {
-      this.logger.error(`Subscribe error`, {
+      this.logger.error(`Subscribe error`, start, {
         payload,
         error,
       });
@@ -26,11 +27,12 @@ export class LogUseCaseSubscriptionDecorator implements SubscriptionProvider {
   }
 
   async confirm(token: string): Promise<void> {
+    const start = Date.now();
     try {
       await this.provider.confirm(token);
-      this.logger.log(`Confirm subscription success`, { token });
+      this.logger.log(`Confirm subscription success`, start, { token });
     } catch (error: unknown) {
-      this.logger.error(`Confirm subscription error`, {
+      this.logger.error(`Confirm subscription error`, start, {
         token,
         error,
       });
@@ -39,11 +41,12 @@ export class LogUseCaseSubscriptionDecorator implements SubscriptionProvider {
   }
 
   async unsubscribe(token: string): Promise<void> {
+    const start = Date.now();
     try {
       await this.provider.unsubscribe(token);
-      this.logger.log(`Unsubscribe success`, { token });
+      this.logger.log(`Unsubscribe success`, start, { token });
     } catch (error: unknown) {
-      this.logger.error(`Unsubscribe error`, {
+      this.logger.error(`Unsubscribe error`, start, {
         token,
         error,
       });

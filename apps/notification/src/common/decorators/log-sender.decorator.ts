@@ -12,14 +12,15 @@ export class LogNotificationSenderDecorator implements NotificationSend {
   ) {}
 
   async send(sub: SubscriptionEntity): Promise<void> {
+    const start = Date.now();
     try {
       await this.sender.send(sub);
-      this.logger.log('Send email success', {
+      this.logger.log('Send email success', start, {
         email: sub.email,
         city: sub.city,
       });
     } catch (error: unknown) {
-      this.logger.error('Send email error', {
+      this.logger.error('Send email error', start, {
         email: sub.email,
         city: sub.city,
         error,
@@ -29,11 +30,15 @@ export class LogNotificationSenderDecorator implements NotificationSend {
   }
 
   async sendByFrequency(frequency: Frequency): Promise<void> {
+    const start = Date.now();
     try {
       await this.sender.sendByFrequency(frequency);
-      this.logger.log('Send email by frequency success', { frequency });
+      this.logger.log('Send email by frequency success', start, { frequency });
     } catch (error: unknown) {
-      this.logger.error('Send email by frequency error', { frequency, error });
+      this.logger.error('Send email by frequency error', start, {
+        frequency,
+        error,
+      });
       throw error;
     }
   }

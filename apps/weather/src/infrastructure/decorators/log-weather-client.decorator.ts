@@ -15,8 +15,9 @@ export class LogWeatherClientDecorator extends WeatherProvider {
   }
 
   async getWeather(city: string): Promise<Weather> {
+    const start = Date.now();
     const response = await this.provider.handle(city);
-    this.logger.log(this.buildLogMessage(response));
+    this.logger.log(this.buildLogMessage(response), start);
     return response;
   }
 

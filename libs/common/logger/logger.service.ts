@@ -42,23 +42,34 @@ export class WinstonLogger implements LoggerService {
     });
   }
 
-  log = (message: string, ...args: unknown[]) => {
-    this.logger.info(message, ...args);
+  private getDurationMeta(startTime?: number, args?: unknown[]) {
+    if (typeof startTime === 'number') {
+      const duration = `${Date.now() - startTime}ms`;
+      if (args && args.length > 0 && typeof args[0] === 'object') {
+        return { ...args[0], duration };
+      }
+      return { duration };
+    }
+    return args && args.length > 0 ? args[0] : undefined;
+  }
+
+  log = (message: string, startTime?: number, ...args: unknown[]) => {
+    this.logger.info(message, this.getDurationMeta(startTime, args));
   };
 
-  error = (message: string, ...args: unknown[]) => {
-    this.logger.error(message, ...args);
+  error = (message: string, startTime?: number, ...args: unknown[]) => {
+    this.logger.error(message, this.getDurationMeta(startTime, args));
   };
 
-  warn = (message: string, ...args: unknown[]) => {
-    this.logger.warn(message, ...args);
+  warn = (message: string, startTime?: number, ...args: unknown[]) => {
+    this.logger.warn(message, this.getDurationMeta(startTime, args));
   };
 
-  debug? = (message: string, ...args: unknown[]) => {
-    this.logger.debug(message, ...args);
+  debug? = (message: string, startTime?: number, ...args: unknown[]) => {
+    this.logger.debug(message, this.getDurationMeta(startTime, args));
   };
 
-  verbose? = (message: string, ...args: unknown[]) => {
-    this.logger.verbose(message, ...args);
+  verbose? = (message: string, startTime?: number, ...args: unknown[]) => {
+    this.logger.verbose(message, this.getDurationMeta(startTime, args));
   };
 }
