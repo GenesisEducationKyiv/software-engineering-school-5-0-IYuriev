@@ -1,6 +1,7 @@
 import { Weather } from '../../domain/weather.entity';
 import { MetricsService } from '../metrics/metrics.service';
 import { WeatherProvider } from '../../infrastructure/providers/weather-client.provider';
+import { measureDuration } from '../metrics/measureDuration';
 
 export class MetricsWeatherDecorator extends WeatherProvider {
   constructor(
@@ -11,7 +12,11 @@ export class MetricsWeatherDecorator extends WeatherProvider {
   }
 
   async getWeather(city: string): Promise<Weather> {
-    const result = await this.provider.handle(city);
+    const { result, ms } = await measureDuration(() =>
+      this.provider.handle(city),
+    );
+    this.metrics.observeWeatherDuration(ms, city, !!result);
+
     if (result) {
       this.metrics.incWeatherSuccess();
     } else {

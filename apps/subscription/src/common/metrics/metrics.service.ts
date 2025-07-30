@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
-import { Counter } from 'prom-client';
+import { Counter, Gauge } from 'prom-client';
 
 export enum SUBSCRIPTION_METRICS_NAMES {
   SUBSCRIBE_SUCCESS_TOTAL = 'subscribe_success_total',
@@ -21,6 +21,11 @@ export enum SUBSCRIPTION_METRICS_NAMES {
 
 @Injectable()
 export class MetricsService {
+  private subscribeDuration = new Gauge({
+    name: 'subscription_request_duration',
+    help: 'Duration of subscription requests in ms',
+    labelNames: ['success', 'email'],
+  });
   constructor(
     @InjectMetric(SUBSCRIPTION_METRICS_NAMES.SUBSCRIBE_SUCCESS_TOTAL)
     private readonly subscribeSuccessCounter: Counter<string>,
@@ -37,6 +42,7 @@ export class MetricsService {
     @InjectMetric(SUBSCRIPTION_METRICS_NAMES.UNSUBSCRIBE_ERROR_TOTAL)
     private readonly unsubscribeErrorCounter: Counter<string>,
   ) {}
+
   incSubscribeSuccess() {
     this.subscribeSuccessCounter.inc();
   }
@@ -54,5 +60,9 @@ export class MetricsService {
   }
   incUnsubscribeError() {
     this.unsubscribeErrorCounter.inc();
+  }
+
+  observeSubscribeDuration(ms: number, success: boolean, email: string) {
+    this.subscribeDuration.set({ success: String(success), email }, ms);
   }
 }
