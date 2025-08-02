@@ -4,16 +4,21 @@ import {
   EmailForecastPayload,
 } from '../../../../../libs/constants/types/email';
 import { WinstonLogger } from '../../../../../libs/common/logger/logger.service';
+import { ConfigService } from '@nestjs/config';
 
 function shouldLog(sampleRate: number): boolean {
   return Math.random() < sampleRate;
 }
 
 export class LogEmailServiceDecorator implements EmailProvider {
+  private readonly sampleRate: number;
   constructor(
     private readonly provider: EmailProvider,
     private readonly logger: WinstonLogger,
-  ) {}
+    private readonly config: ConfigService,
+  ) {
+    this.sampleRate = Number(this.config.get('EMAIL_LOG_SAMPLE_RATE'));
+  }
 
   async sendConfirmationEmail(
     payload: EmailConfirmationPayload,
@@ -21,7 +26,7 @@ export class LogEmailServiceDecorator implements EmailProvider {
     const start = Date.now();
     try {
       await this.provider.sendConfirmationEmail(payload);
-      if (shouldLog(0.1)) {
+      if (shouldLog(this.sampleRate)) {
         this.logger.log(`Send confirmation email success`, start, {
           email: payload.email,
         });
@@ -39,7 +44,7 @@ export class LogEmailServiceDecorator implements EmailProvider {
     const start = Date.now();
     try {
       await this.provider.sendForecastEmail(payload);
-      if (shouldLog(0.1)) {
+      if (shouldLog(this.sampleRate)) {
         this.logger.log(`Send forecast email success`, start, { payload });
       }
     } catch (error: unknown) {

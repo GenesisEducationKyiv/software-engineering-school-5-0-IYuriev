@@ -68,8 +68,4 @@ export class WinstonLogger implements LoggerService {
   debug? = (message: string, startTime?: number, ...args: unknown[]) => {
     this.logger.debug(message, this.getDurationMeta(startTime, args));
   };
-
-  verbose? = (message: string, startTime?: number, ...args: unknown[]) => {
-    this.logger.verbose(message, this.getDurationMeta(startTime, args));
-  };
 }
