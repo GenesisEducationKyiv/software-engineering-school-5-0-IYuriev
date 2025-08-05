@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { EmailPublisher } from './publishers/email.publisher';
-import { EmailPublish } from '../application/subscription/interfaces/email.publisher.interface';
 import { SubscriptionService } from '../application/subscription/use-cases/subscription.service';
 import { LogUseCaseSubscriptionDecorator } from '../common/decorators/log-use-case-subscription.decorator';
 import { WinstonLogger } from '../../../../libs/common/logger/logger.service';
@@ -20,6 +18,8 @@ import { LogSubscriptionRepoDecorator } from '../common/decorators/log-subscript
 import { MetricsService } from '../common/metrics/metrics.service';
 import { MetricsSubscriptionDecorator } from '../common/decorators/metrics-subscription.decorator';
 import { MetricsModule } from '../common/metrics/metrics.module';
+import { KafkaEmailPublisher } from './publishers/email.publisher';
+import { EmailPublisher } from '../application/subscription/interfaces/email.publisher.interface';
 
 @Module({
   imports: [
@@ -63,8 +63,8 @@ import { MetricsModule } from '../common/metrics/metrics.module';
       inject: [SubscriptionRepository, SUBSCRIPTION_REPO_LOGGER],
     },
     {
-      provide: EmailPublish,
-      useClass: EmailPublisher,
+      provide: EmailPublisher,
+      useClass: KafkaEmailPublisher,
     },
     {
       provide: SubscriptionProvider,
@@ -86,6 +86,6 @@ import { MetricsModule } from '../common/metrics/metrics.module';
       ],
     },
   ],
-  exports: [EmailPublish, SubscriptionProvider, SubscriptionRepo],
+  exports: [EmailPublisher, SubscriptionProvider, SubscriptionRepo],
 })
 export class SubscriptionModule {}

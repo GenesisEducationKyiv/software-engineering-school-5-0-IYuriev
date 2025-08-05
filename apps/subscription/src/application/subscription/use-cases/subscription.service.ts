@@ -6,12 +6,12 @@ import {
 import { SubscriptionRepo } from '../interfaces/subscription-repoository.interface';
 import { TokenProvider } from '../../../domain/token/token-service.interface';
 import { RpcException } from '@nestjs/microservices';
-import { EmailPublish } from '../interfaces/email.publisher.interface';
+import { EmailPublisher } from '../interfaces/email.publisher.interface';
 
 @Injectable()
 export class SubscriptionService implements SubscriptionProvider {
   constructor(
-    private readonly emailPublisher: EmailPublish,
+    private readonly emailPublisher: EmailPublisher,
     private readonly subscriptionRepo: SubscriptionRepo,
     private readonly tokenService: TokenProvider,
   ) {}

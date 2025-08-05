@@ -5,11 +5,11 @@ import { SubscriptionRepo } from '../src/application/subscription/interfaces/sub
 import { TokenProvider } from '../src/domain/token/token-service.interface';
 import { SubscriptionPayload } from '../src/domain/subscription/subscription-service.interface';
 import { Frequency } from '../src/domain/subscription/subscription.entity';
-import { EmailPublish } from '../src/application/subscription/interfaces/email.publisher.interface';
+import { EmailPublisher } from '../src/application/subscription/interfaces/email.publisher.interface';
 
 describe('SubscriptionService', () => {
   let service: SubscriptionService;
-  let emailPublisher: jest.Mocked<EmailPublish>;
+  let emailPublisher: jest.Mocked<EmailPublisher>;
   let subscriptionRepo: jest.Mocked<SubscriptionRepo>;
   let tokenService: jest.Mocked<TokenProvider>;
 
@@ -22,7 +22,7 @@ describe('SubscriptionService', () => {
   beforeEach(() => {
     emailPublisher = {
       sendConfirmationEmail: jest.fn(),
-    } as unknown as jest.Mocked<EmailPublish>;
+    } as unknown as jest.Mocked<EmailPublisher>;
     subscriptionRepo = {
       findSubscription: jest.fn(),
       create: jest.fn(),

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
-import { CACHE_METRICS_NAMES } from '../../../libs/constants/enums/metrics';
+import { CACHE_METRICS_NAMES } from '../../../../constants/enums/metrics';
 import { Counter } from 'prom-client';
 
 @Injectable()
