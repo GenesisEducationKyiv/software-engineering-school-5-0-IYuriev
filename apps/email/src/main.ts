@@ -23,6 +23,7 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
+  await app.listen(Number(config.get<number>('HTTP_PORT')));
 }
 
 bootstrap().catch((err) => {

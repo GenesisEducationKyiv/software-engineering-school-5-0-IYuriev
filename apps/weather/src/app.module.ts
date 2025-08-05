@@ -7,9 +7,16 @@ import { WeatherService } from './application/weather.service';
 import { WeatherClientToken } from './domain/weather.interface';
 import { WeatherApiController } from './presentation/weather.controller';
 import { WeatherFactory } from './infrastructure/factories/weather-factory';
+import { MetricsModule } from './common/metrics/metrics.module';
 
 @Module({
-  imports: [CacheModule, WeatherClientModule, LoggerModule, HttpModule],
+  imports: [
+    CacheModule,
+    WeatherClientModule,
+    LoggerModule,
+    HttpModule,
+    MetricsModule,
+  ],
   controllers: [WeatherApiController],
   providers: [
     WeatherService,

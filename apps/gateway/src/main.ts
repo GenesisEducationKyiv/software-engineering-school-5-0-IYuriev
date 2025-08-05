@@ -1,16 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { WinstonLogger } from '../../../libs/common/logger/logger.service';
+import * as dotenv from 'dotenv';
 import { AppModule } from './app.module';
 import { CustomExceptionFilter } from '../../../libs/common/filters/exception.filter';
+import { GATEWAY_MODULE_LOGGER } from '../../../libs/common/logger/logger.module';
+import { WinstonLogger } from '../../../libs/common/logger/logger.service';
 import { ConfigService } from '@nestjs/config';
+dotenv.config({ path: '.env.gateway' });
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const logger = app.get<WinstonLogger>(GATEWAY_MODULE_LOGGER);
   const config = app.get(ConfigService);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.setGlobalPrefix('api');
-  app.useLogger(app.get(WinstonLogger));
+  app.useLogger(logger);
 
   app.useGlobalFilters(new CustomExceptionFilter());
 

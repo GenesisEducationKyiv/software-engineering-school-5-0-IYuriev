@@ -13,11 +13,12 @@ async function bootstrap() {
     options: {
       package: 'subscription',
       protoPath: join(__dirname, '../../../libs/proto/src/subscription.proto'),
-      url: `0.0.0.0:${config.get<string>('PORT')}`,
+      url: `${config.get<string>('GRPC_URL')}`,
     },
   });
 
   await app.startAllMicroservices();
+  await app.listen(Number(config.get<number>('HTTP_PORT')));
 }
 
 bootstrap().catch((err) => {
