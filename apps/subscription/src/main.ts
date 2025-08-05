@@ -13,7 +13,7 @@ async function bootstrap() {
     options: {
       package: 'subscription',
       protoPath: join(__dirname, '../../../libs/proto/src/subscription.proto'),
-      url: `0.0.0.0:${config.get<string>('GRPC_PORT')}`,
+      url: `${config.get<string>('GRPC_URL')}`,
     },
   });
 
