@@ -11,20 +11,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create .env.test file
-        run: echo "${{ secrets.TEST_ENV_FILE }}" > .env.test
-
-      - name: Create .env.test for email
-        run: echo "${{ secrets.TEST_EMAIL_ENV_FILE }}" > apps/email/.env.test
-
-      - name: Create .env.test for weather
-        run: echo "${{ secrets.TEST_WEATHER_ENV_FILE }}" > apps/weather/.env.test
-
-      - name: Create .env.test for subscription
-        run: echo "${{ secrets.TEST_SUBSCRIPTION_ENV_FILE }}" > apps/subscription/.env.test
-
-      - name: Create .env.test for gateway
-        run: echo "${{ secrets.TEST_GATEWAY_ENV_FILE }}" > apps/gateway/.env.test
+      - name: Create .env.test files for all services
+        run: |
+          echo "${{ secrets.TEST_EMAIL_ENV_FILE }}" > apps/email/.env.test
+          echo "${{ secrets.TEST_WEATHER_ENV_FILE }}" > apps/weather/.env.test
+          echo "${{ secrets.TEST_SUBSCRIPTION_ENV_FILE }}" > apps/subscription/.env.test
+          echo "${{ secrets.TEST_GATEWAY_ENV_FILE }}" > apps/gateway/.env.test
 
       - name: Run all unit tests via Docker Compose
         run: docker compose -f docker-compose.test.yml up --build --abort-on-container-exit email-test notification-test subscription-test weather-test
