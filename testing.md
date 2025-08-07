@@ -1,12 +1,12 @@
 # Testing Guide
 
-This project includes three types of tests: **unit**, **integration**, and **end-to-end**. All tests can be run in isolated Docker containers using Docker Compose.
+This project includes three types of tests: **unit**, **integration**, and **architecture**. All tests can be run in isolated Docker containers using Docker Compose.
 
 ---
 
 ## Preparation
 
-Before running tests, make sure your `.env` and `.env.test` files are properly filled (see [README.md](README.md#🔑-how-to-fill-environment-variables)).
+Before running tests, make sure your `.env.test` files are properly filled (see [README.md](README.md#🔑-how-to-fill-environment-variables)).
 
 ---
 
@@ -15,19 +15,19 @@ Before running tests, make sure your `.env` and `.env.test` files are properly f
 ### 1. Unit Tests
 
 ```sh
-docker-compose -f docker-compose.test.yml up --build node-unit-test
+docker compose -f docker-compose.test.yml up --build --abort-on-container-exit email-test notification-test subscription-test weather-test
 ```
 
 ### 2. Integration Tests
 
 ```sh
-docker-compose -f docker-compose.test.yml up --build node-integration-test
+docker compose -f docker-compose.test.yml up --build --abort-on-container-exit gateway-integration-test
 ```
 
-### 3. End-to-End Tests
+### 3. Architecture Tests
 
 ```sh
-docker-compose -f docker-compose.test.yml up --build node-e2e-test
+docker compose -f docker-compose.test.yml up --build --abort-on-container-exit gateway-architecture-test
 ```
 
 ---

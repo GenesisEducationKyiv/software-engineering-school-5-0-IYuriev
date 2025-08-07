@@ -99,38 +99,27 @@ npm install
 
 3. Set up environment variables:
 
-Copy `.env.example` to `.env`, `.env.test.example` to `.env.test` and add your configuration:
+Copy `env.example` to `.env.*`, `env.test.example` to `.env.test` and add your configuration:
 
-```env
-# .env.example
-DATABASE_URL="postgresql://postgres:postgres@db:5432/weather-subscription-service"
-POSTGRES_PASSWORD=postgres
-POSTGRES_USER=postgres
-POSTGRES_DB=weather-subscription-service
-PORT=3000
-WEATHER_API_URL=http://api.weatherapi.com/v1/
-CONFIRMATION_URL=http://localhost:3000/api/confirm
-UNSUBSCRIBE_URL=http://localhost:3000/api/unsubscribe
-REDIS_URL=redis://redis:6379
-API_KEY=
-EMAIL_USER=
-EMAIL_PASS=
-```
+```bash 
+# Email
+cp apps/email/env.example apps/email/.env.email
+cp apps/email/env.test.example apps/email/.env.test
 
-```env
-# .env.test.example
-DATABASE_URL=postgresql://postgres:postgres@db-test:5432/weather-subscription-service-test
-POSTGRES_PASSWORD=postgres
-POSTGRES_USER=postgres
-POSTGRES_DB=weather-subscription-service-test
-PORT=3000
-WEATHER_API_URL=http://api.weatherapi.com/v1/
-CONFIRMATION_URL=http://localhost:3000/api/confirm
-UNSUBSCRIBE_URL=http://localhost:3000/api/unsubscribe
-REDIS_URL=redis://redis-test:6379
-API_KEY=
-EMAIL_USER=
-EMAIL_PASS=
+# Gateway
+cp apps/gateway/env.example apps/gateway/.env
+cp apps/gateway/env.test.example apps/gateway/.env.test
+
+# Subscription
+cp apps/subscription/env.example apps/subscription/.env.gateway
+cp apps/subscription/env.test.example apps/subscription/.env.test
+
+# Weather
+cp apps/weather/env.example apps/weather/.env.weather
+cp apps/weather/env.test.example apps/weather/.env.test
+
+# Notification
+cp apps/notification/env.example apps/notification/.env.notification
 ```
 
 ## 🔑 How to Fill Environment Variables
@@ -148,29 +137,15 @@ To get the project running smoothly, you’ll need to populate the `.env` and `.
 docker-compose up --build
 ```
 
-5. Run tests:
-
-```bash
-docker-compose -f docker-compose.test.yml up --build
-```
-
-6. Access the UI:
+5. Access the UI:
 
 Visit the live demo: [Weather Subscription Service](https://weather-subscription-service.vercel.app)
 
 ## ✅ Testing
 
-The project includes comprehensive test coverage using **Jest** and **Supertest**, with the following test types:
+The project includes comprehensive test coverage using **Jest** and **Supertest** with unit, integration, and architecture tests.
 
-- **Unit tests** – test isolated services, utilities, and business logic.
-- **Integration tests** – verify interactions between modules (e.g., service + database).
-- **End-to-End (e2e) tests** – test the full request/response cycle of the API.
-
-```bash
-docker-compose -f docker-compose.test.yml up --build
-```
-
-Test environment uses separate containers and test-specific `.env.test` configuration.
+For detailed testing instructions and commands, please refer to [testing.md](testing.md).
 
 ## 📨 Email Templates
 

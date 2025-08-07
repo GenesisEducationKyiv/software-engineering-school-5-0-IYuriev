@@ -1,4 +1,4 @@
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Email } from '../../../libs/constants/enums/email';
 import {
@@ -19,6 +19,12 @@ describe('EmailService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        ConfigModule.forRoot({
+          envFilePath: __dirname + '/../.env.test',
+          isGlobal: true,
+        }),
+      ],
       providers: [
         EmailService,
         { provide: EmailTransportToken, useValue: mockEmailTransport },
