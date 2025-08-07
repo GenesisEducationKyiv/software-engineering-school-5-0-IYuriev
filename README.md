@@ -120,6 +120,7 @@ cp apps/weather/env.test.example apps/weather/.env.test
 
 # Notification
 cp apps/notification/env.example apps/notification/.env.notification
+cp apps/notification/env.test.example apps/notification/.env.test
 ```
 
 ## 🔑 How to Fill Environment Variables

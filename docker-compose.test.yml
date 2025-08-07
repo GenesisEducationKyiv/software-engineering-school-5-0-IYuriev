@@ -38,7 +38,7 @@ services:
       context: .
       dockerfile: apps/email/Dockerfile.test
     env_file:
-      - .env.test
+      - apps/email/.env.test
     depends_on:
       db-test:
         condition: service_healthy
@@ -68,7 +68,7 @@ services:
       context: .
       dockerfile: apps/gateway/Dockerfile.test
     env_file:
-      - .env.test
+      - apps/gateway/.env.test
     depends_on:
       db-test:
         condition: service_healthy
@@ -81,7 +81,7 @@ services:
       context: .
       dockerfile: apps/notification/Dockerfile.test
     env_file:
-      - .env.test
+      - apps/notification/.env.test
     depends_on:
       db-test:
         condition: service_healthy
@@ -94,7 +94,7 @@ services:
       context: .
       dockerfile: apps/subscription/Dockerfile.test
     env_file:
-      - .env.test
+      - apps/subscription/.env.test
     depends_on:
       db-test:
         condition: service_healthy
@@ -107,7 +107,7 @@ services:
       context: .
       dockerfile: apps/weather/Dockerfile.test
     env_file:
-      - .env.test
+      - apps/weather/.env.test
     depends_on:
       db-test:
         condition: service_healthy
