@@ -1,0 +1,177 @@
+version: '3.8'
+
+volumes:
+  postgres-db:
+  redis-data:
+  email-data:
+  weather-data:
+  subscription-data:
+  notification-data:
+  gateway-data:
+
+services:
+  db:
+    container_name: db
+    image: postgres:17-alpine
+    restart: always
+    shm_size: 128mb
+    env_file:
+      - apps/subscription/.env.subscription
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+    user: postgres
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -d postgres']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    container_name: redis
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - 6380:6379
+    volumes:
+      - redis-data:/data
+
+  email:
+    container_name: email
+    build:
+      context: .
+      dockerfile: apps/email/Dockerfile
+    env_file:
+      - apps/email/.env.email
+    ports:
+      - 4000:4000
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+    volumes:
+      - .:/app
+      - email-data:/app/node_modules
+
+  weather:
+    container_name: weather
+    build:
+      context: .
+      dockerfile: apps/weather/Dockerfile
+    env_file:
+      - apps/weather/.env.weather
+    ports:
+      - 4001:4001
+      - 5001:5001
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - .:/app
+      - weather-data:/app/node_modules
+
+  subscription:
+    container_name: subscription
+    build:
+      context: .
+      dockerfile: apps/subscription/Dockerfile
+    env_file:
+      - apps/subscription/.env.subscription
+    ports:
+      - 4002:4002
+      - 5002:5002
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      email:
+        condition: service_started
+    volumes:
+      - .:/app
+      - subscription-data:/app/node_modules
+
+  notification:
+    container_name: notification
+    build:
+      context: .
+      dockerfile: apps/notification/Dockerfile
+    env_file:
+      - apps/notification/.env.notification
+    ports:
+      - 4003:4003
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - .:/app
+      - notification-data:/app/node_modules
+
+  gateway:
+    container_name: gateway
+    build:
+      context: .
+      dockerfile: apps/gateway/Dockerfile
+    env_file:
+      - apps/gateway/.env.gateway
+    ports:
+      - 3000:3000
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - .:/app
+      - gateway-data:/app/node_modules
+
+  kafka:
+    image: bitnami/kafka:latest
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          '/opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list',
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  kafka-init:
+    image: bitnami/kafka:latest
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ['/bin/sh', '-c']
+    command:
+      - |
+        /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic send-confirmation-email --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 || true
+        /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic send-forecast-email --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 || true
+    restart: 'no'
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - '8080:8080'
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - DYNAMIC_CONFIG_ENABLED=true

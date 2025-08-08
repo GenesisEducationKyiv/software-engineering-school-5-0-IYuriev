@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Forecast API</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Weather Forecast API</h1>
+        <p>Get weather updates for your city</p>
+      </header>
+
+      <main>
+        <section class="card" id="weather-section">
+          <h2>Current Weather</h2>
+          <form id="weather-form">
+            <div class="form-group">
+              <label for="weather-city">City:</label>
+              <input
+                type="text"
+                id="weather-city"
+                name="city"
+                required
+                placeholder="Enter city name"
+              />
+            </div>
+            <button type="submit" class="btn">Get Weather</button>
+          </form>
+          <div id="weather-result" class="result-container hidden">
+            <div class="weather-info">
+              <h3 id="weather-city-name"></h3>
+              <p id="weather-description"></p>
+              <div class="weather-details">
+                <div class="weather-detail">
+                  <span class="label">Temperature:</span>
+                  <span id="weather-temperature"></span>
+                </div>
+                <div class="weather-detail">
+                  <span class="label">Humidity:</span>
+                  <span id="weather-humidity"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="weather-error" class="error-message hidden"></div>
+        </section>
+
+        <section class="card" id="subscription-section">
+          <h2>Subscribe to Weather Updates</h2>
+          <form id="subscription-form">
+            <div class="form-group">
+              <label for="subscription-email">Email:</label>
+              <input
+                type="email"
+                id="subscription-email"
+                name="email"
+                required
+                placeholder="Your email address"
+              />
+            </div>
+            <div class="form-group">
+              <label for="subscription-city">City:</label>
+              <input
+                type="text"
+                id="subscription-city"
+                name="city"
+                required
+                placeholder="City for weather updates"
+              />
+            </div>
+            <div class="form-group">
+              <label for="subscription-frequency">Frequency:</label>
+              <select id="subscription-frequency" name="frequency" required>
+                <option value="hourly">Hourly</option>
+                <option value="daily">Daily</option>
+              </select>
+            </div>
+            <button type="submit" class="btn">Subscribe</button>
+          </form>
+          <div id="subscription-result" class="result-container hidden"></div>
+          <div id="subscription-error" class="error-message hidden"></div>
+        </section>
+      </main>
+
+      <div id="notification" class="notification hidden"></div>
+    </div>
+
+    <script>
+      window.API_BASE_URL =
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1'
+          ? 'http://localhost:3000/api'
+          : 'http://node-server:3000/api';
+    </script>
+    <script src="app.js"></script>
+  </body>
+</html>

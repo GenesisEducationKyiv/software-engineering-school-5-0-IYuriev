@@ -1,0 +1,30 @@
+name: Integration Test Pipeline
+
+on:
+  push:
+
+jobs:
+  integration-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create .env.test files for all services
+        run: |
+          echo "${{ secrets.TEST_EMAIL_ENV_FILE }}" > apps/email/.env.test
+          echo "${{ secrets.TEST_WEATHER_ENV_FILE }}" > apps/weather/.env.test
+          echo "${{ secrets.TEST_SUBSCRIPTION_ENV_FILE }}" > apps/subscription/.env.test
+          echo "${{ secrets.TEST_GATEWAY_ENV_FILE }}" > apps/gateway/.env.test
+          echo "${{ secrets.TEST_NOTIFICATION_ENV_FILE }}" > apps/notification/.env.test
+
+      - name: Build required images
+        run: docker compose -f docker-compose.test.yml build weather email subscription
+
+      - name: Run integration tests via Docker Compose
+        run: docker compose -f docker-compose.test.yml up --build --abort-on-container-exit gateway-integration-test
+
+      - name: Clean up only gateway-integration-test
+        if: always()
+        run: docker compose -f docker-compose.test.yml rm -sf gateway-integration-test
