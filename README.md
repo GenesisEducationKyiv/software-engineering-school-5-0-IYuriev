@@ -87,7 +87,7 @@ This project includes a GitHub Actions-based **CI/CD pipeline** that automatical
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/IYuriev/weather-subscription-service.git
+git clone https://github.com/GenesisEducationKyiv/software-engineering-school-5-0-IYuriev.git
 cd weather-subscription-service
 ```
 
